@@ -44,7 +44,7 @@ export default function Settings({ onToast }: SettingsProps) {
       onToast(t('noExpenses'), 'error');
       return;
     }
-    exportToCSV(state.expenses, t as (key: string) => string);
+    exportToCSV(state.expenses, t as (key: string) => string, tc);
     onToast('CSV exported!', 'success');
   }
 

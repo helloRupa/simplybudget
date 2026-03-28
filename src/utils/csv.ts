@@ -1,16 +1,27 @@
 import { Expense } from '@/types';
 import { formatDate } from './dates';
 
-export function exportToCSV(expenses: Expense[], t: (key: string) => string): void {
+function csvCell(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+export function exportToCSV(
+  expenses: Expense[],
+  t: (key: string) => string,
+  tc: (category: string) => string,
+): void {
   const headers = [t('date'), t('amount'), t('category'), t('description')];
   const rows = expenses.map((e) => [
-    formatDate(e.date),
+    csvCell(formatDate(e.date)),
     e.amount.toFixed(2),
-    e.category,
-    `"${e.description.replace(/"/g, '""')}"`,
+    csvCell(tc(e.category)),
+    csvCell(e.description),
   ]);
 
-  const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  const csv = [headers.map(csvCell).join(','), ...rows.map((r) => r.join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
