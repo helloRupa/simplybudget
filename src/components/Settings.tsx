@@ -10,7 +10,7 @@ interface SettingsProps {
 }
 
 export default function Settings({ onToast }: SettingsProps) {
-  const { state, setWeeklyBudget, addCategory, deleteCategory, setCurrency, t, tc, fc, currencySymbol } = useBudget();
+  const { state, setWeeklyBudget, addCategory, deleteCategory, setCurrency, t, tc, fc, fd, currencySymbol } = useBudget();
   const [budgetInput, setBudgetInput] = useState(state.weeklyBudget.toString());
   const [newCategory, setNewCategory] = useState('');
   const [budgetError, setBudgetError] = useState('');
@@ -44,7 +44,7 @@ export default function Settings({ onToast }: SettingsProps) {
       onToast(t('noExpenses'), 'error');
       return;
     }
-    exportToCSV(state.expenses, t as (key: string) => string, tc);
+    exportToCSV(state.expenses, t as (key: string) => string, tc, fd);
     onToast('CSV exported!', 'success');
   }
 

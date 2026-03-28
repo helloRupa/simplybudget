@@ -2,13 +2,13 @@
 
 import { useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { getWeekRange, getMonthRange, getWeekRanges, toISODate } from '@/utils/dates';
+import { getWeekRange, getMonthRange, getWeekRanges, toISODate, formatShortDate } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import SpendingChart from './SpendingChart';
-import { parseISO, isWithinInterval, format } from 'date-fns';
+import { parseISO, isWithinInterval } from 'date-fns';
 
 export default function Dashboard() {
-  const { state, t, tc, fc, currencySymbol } = useBudget();
+  const { state, t, tc, fc, currencySymbol, intlLocale } = useBudget();
 
   const stats = useMemo(() => {
     const { start: weekStart, end: weekEnd } = getWeekRange();
@@ -63,7 +63,7 @@ export default function Dashboard() {
         .reduce((sum, e) => sum + e.amount, 0);
 
       return {
-        week: format(range.start, 'MMM d'),
+        week: formatShortDate(range.start, intlLocale),
         spent: weekExpenseTotal,
         budget: state.weeklyBudget,
       };

@@ -20,12 +20,24 @@ export function getMonthRange(date: Date = new Date()) {
   return { start: startOfMonth(date), end: endOfMonth(date) };
 }
 
-export function formatDate(dateStr: string, fmt = 'MMM d, yyyy'): string {
+export function formatDate(dateStr: string, intlLocale = 'en-US'): string {
   try {
-    return format(parseISO(dateStr), fmt);
+    const date = parseISO(dateStr);
+    return new Intl.DateTimeFormat(intlLocale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   } catch {
     return dateStr;
   }
+}
+
+export function formatShortDate(date: Date, intlLocale = 'en-US'): string {
+  return new Intl.DateTimeFormat(intlLocale, {
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
 }
 
 export function isInRange(dateStr: string, from: string, to: string): boolean {

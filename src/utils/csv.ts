@@ -1,5 +1,4 @@
 import { Expense } from '@/types';
-import { formatDate } from './dates';
 
 function csvCell(value: string): string {
   if (value.includes(',') || value.includes('"') || value.includes('\n')) {
@@ -12,10 +11,11 @@ export function exportToCSV(
   expenses: Expense[],
   t: (key: string) => string,
   tc: (category: string) => string,
+  fd: (dateStr: string) => string,
 ): void {
   const headers = [t('date'), t('amount'), t('category'), t('description')];
   const rows = expenses.map((e) => [
-    csvCell(formatDate(e.date)),
+    csvCell(fd(e.date)),
     e.amount.toFixed(2),
     csvCell(tc(e.category)),
     csvCell(e.description),

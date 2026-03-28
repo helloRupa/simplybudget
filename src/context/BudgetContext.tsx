@@ -5,7 +5,7 @@ import { Expense } from '@/types';
 import { DEFAULT_CATEGORIES, STORAGE_KEYS, CurrencyCode } from '@/utils/constants';
 import { formatCurrency, getCurrencySymbol } from '@/utils/currency';
 import { getItem, setItem } from '@/utils/storage';
-import { toISODate } from '@/utils/dates';
+import { toISODate, formatDate } from '@/utils/dates';
 import { locales, LocaleKey, TranslationKey, categoryTranslations } from '@/i18n/locales';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -87,7 +87,9 @@ interface BudgetContextValue {
   t: (key: TranslationKey) => string;
   tc: (category: string) => string;
   fc: (amount: number) => string;
+  fd: (dateStr: string) => string;
   currencySymbol: string;
+  intlLocale: string;
   isLoaded: boolean;
 }
 
@@ -192,7 +194,15 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     [state.locale, state.currency]
   );
 
-  const currencySymbol = getCurrencySymbol(state.currency, LOCALE_TO_INTL[state.locale]);
+  const fd = useCallback(
+    (dateStr: string): string => {
+      return formatDate(dateStr, LOCALE_TO_INTL[state.locale]);
+    },
+    [state.locale]
+  );
+
+  const intlLocale = LOCALE_TO_INTL[state.locale];
+  const currencySymbol = getCurrencySymbol(state.currency, intlLocale);
 
   return (
     <BudgetContext.Provider
@@ -209,7 +219,9 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         t,
         tc,
         fc,
+        fd,
         currencySymbol,
+        intlLocale,
         isLoaded,
       }}
     >

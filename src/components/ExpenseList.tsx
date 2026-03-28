@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import { Expense, FilterState, SortState } from '@/types';
-import { formatDate, isInRange } from '@/utils/dates';
+import { isInRange } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import ExpenseFilters from './ExpenseFilters';
 
@@ -13,7 +13,7 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
-  const { state, deleteExpense, t, tc, fc } = useBudget();
+  const { state, deleteExpense, t, tc, fc, fd } = useBudget();
   const [filters, setFilters] = useState<FilterState>({
     dateFrom: '',
     dateTo: '',
@@ -131,7 +131,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                     key={expense.id}
                     className="border-b border-slate-600/10 hover:bg-slate-700/30 transition-colors"
                   >
-                    <td className="px-5 py-3 text-sm text-slate-300">{formatDate(expense.date)}</td>
+                    <td className="px-5 py-3 text-sm text-slate-300">{fd(expense.date)}</td>
                     <td className="px-5 py-3">
                       <span
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
@@ -205,7 +205,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                       <span className="w-2 h-2 rounded-full mr-1.5" style={{ backgroundColor: getCategoryColor(expense.category) }} />
                       {tc(expense.category)}
                     </span>
-                    <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
+                    <p className="text-xs text-slate-500 mt-1">{fd(expense.date)}</p>
                   </div>
                   <p className="text-lg font-bold text-amber-300">{fc(expense.amount)}</p>
                 </div>
