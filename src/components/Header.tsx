@@ -18,12 +18,12 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
   ];
 
   return (
-    <header className="bg-purple-900/80 backdrop-blur-sm border-b border-purple-700/50 sticky top-0 z-50">
+    <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-600/50 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-400 rounded-lg flex items-center justify-center">
-              <span className="text-purple-950 font-bold text-lg">$</span>
+            <div className="w-8 h-8 bg-teal-400 rounded-lg flex items-center justify-center">
+              <span className="text-slate-900 font-bold text-lg">$</span>
             </div>
             <h1 className="text-xl font-bold text-white">{t('appName')}</h1>
           </div>
@@ -35,8 +35,8 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
                 onClick={() => onTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
-                    : 'text-purple-200 hover:text-white hover:bg-purple-800/50'
+                    ? 'bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/10 border border-teal-400/30'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                 }`}
               >
                 <tab.icon />
@@ -48,7 +48,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
           <select
             value={state.locale}
             onChange={(e) => setLocale(e.target.value as LocaleKey)}
-            className="bg-purple-800/50 text-purple-200 text-sm rounded-lg px-2 py-1.5 border border-purple-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            className="bg-slate-700/50 text-slate-300 text-sm rounded-lg px-2 py-1.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
           >
             {Object.entries(LOCALE_NAMES).map(([key, name]) => (
               <option key={key} value={key}>
@@ -66,8 +66,8 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
               onClick={() => onTabChange(tab.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-800/50'
+                  ? 'bg-teal-500/20 text-teal-300 border border-teal-400/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
             >
               <tab.icon />

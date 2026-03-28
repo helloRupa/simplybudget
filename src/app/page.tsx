@@ -31,7 +31,7 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#1e1040] to-[#16082a]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0f1d] via-[#0f1729] to-[#111d35]">
       <Header activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="max-w-6xl mx-auto px-4 py-6">

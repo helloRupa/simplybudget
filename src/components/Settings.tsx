@@ -54,50 +54,50 @@ export default function Settings({ onToast }: SettingsProps) {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       {/* Weekly Budget Setting */}
-      <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-6">
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">{t('setBudget')}</h2>
         <form onSubmit={handleBudgetSubmit} className="flex gap-3">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-300">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">$</span>
             <input
               type="number"
               step="0.01"
               min="0"
               value={budgetInput}
               onChange={(e) => setBudgetInput(e.target.value)}
-              className={`w-full bg-purple-900/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${
-                budgetError ? 'border-red-400' : 'border-purple-600/50'
-              } focus:outline-none focus:ring-2 focus:ring-purple-400`}
+              className={`w-full bg-slate-700/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${
+                budgetError ? 'border-red-400' : 'border-slate-500/50'
+              } focus:outline-none focus:ring-2 focus:ring-teal-400`}
               placeholder={t('budgetAmount')}
             />
           </div>
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/25 transition-all"
+            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 transition-all"
           >
             {t('save')}
           </button>
         </form>
         {budgetError && <p className="text-red-400 text-xs mt-2">{budgetError}</p>}
-        <p className="text-purple-400 text-xs mt-2">
+        <p className="text-slate-500 text-xs mt-2">
           {t('weeklyBudget')}: {formatCurrency(state.weeklyBudget)}
         </p>
       </div>
 
       {/* Category Management */}
-      <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-6">
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">{t('manageCategories')}</h2>
         <form onSubmit={handleAddCategory} className="flex gap-3 mb-4">
           <input
             type="text"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
-            className="flex-1 bg-purple-900/50 text-white rounded-xl px-4 py-2.5 border border-purple-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-400"
+            className="flex-1 bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500"
             placeholder={t('newCategoryPlaceholder')}
           />
           <button
             type="submit"
-            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/25 transition-all"
+            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 transition-all"
           >
             {t('addCategory')}
           </button>
@@ -106,9 +106,9 @@ export default function Settings({ onToast }: SettingsProps) {
           {state.categories.map((cat) => (
             <div
               key={cat}
-              className="flex items-center gap-2 bg-purple-900/40 rounded-xl px-3 py-2 border border-purple-600/20"
+              className="flex items-center gap-2 bg-slate-700/40 rounded-xl px-3 py-2 border border-slate-600/20"
             >
-              <span className="text-sm text-purple-100">{cat}</span>
+              <span className="text-sm text-slate-200">{cat}</span>
               {!isDefaultCategory(cat) && (
                 <button
                   onClick={() => deleteCategory(cat)}
@@ -124,18 +124,18 @@ export default function Settings({ onToast }: SettingsProps) {
       </div>
 
       {/* Export */}
-      <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-6">
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">{t('exportData')}</h2>
         <button
           onClick={handleExportCSV}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/25 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 transition-all"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           {t('exportCSV')}
         </button>
-        <p className="text-purple-400 text-xs mt-2">
+        <p className="text-slate-500 text-xs mt-2">
           {state.expenses.length} {t('expenses').toLowerCase()}
         </p>
       </div>

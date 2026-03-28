@@ -27,7 +27,7 @@ interface SpendingChartProps {
 export default function SpendingChart({ data, t }: SpendingChartProps) {
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-purple-400">
+      <div className="h-64 flex items-center justify-center text-slate-500">
         No data to display
       </div>
     );
@@ -39,39 +39,39 @@ export default function SpendingChart({ data, t }: SpendingChartProps) {
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#7e22ce33" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
           <XAxis
             dataKey="week"
-            tick={{ fill: '#c4b5fd', fontSize: 12 }}
-            axisLine={{ stroke: '#7e22ce55' }}
-            tickLine={{ stroke: '#7e22ce55' }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
+            axisLine={{ stroke: '#475569' }}
+            tickLine={{ stroke: '#475569' }}
           />
           <YAxis
-            tick={{ fill: '#c4b5fd', fontSize: 12 }}
-            axisLine={{ stroke: '#7e22ce55' }}
-            tickLine={{ stroke: '#7e22ce55' }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
+            axisLine={{ stroke: '#475569' }}
+            tickLine={{ stroke: '#475569' }}
             tickFormatter={(v) => `$${v}`}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#3b0764',
-              border: '1px solid #7e22ce',
+              backgroundColor: '#1e293b',
+              border: '1px solid #475569',
               borderRadius: '12px',
               color: '#fff',
             }}
             formatter={(value) => [`$${Number(value).toFixed(2)}`, '']}
-            labelStyle={{ color: '#c4b5fd' }}
+            labelStyle={{ color: '#94a3b8' }}
           />
           <Legend
-            wrapperStyle={{ color: '#c4b5fd', fontSize: 12 }}
+            wrapperStyle={{ color: '#94a3b8', fontSize: 12 }}
           />
           <ReferenceLine
             y={budgetAmount}
-            stroke="#22c55e"
+            stroke="#2dd4bf"
             strokeDasharray="5 5"
             label={{
               value: t('budget'),
-              fill: '#22c55e',
+              fill: '#2dd4bf',
               fontSize: 11,
               position: 'right',
             }}
@@ -79,7 +79,7 @@ export default function SpendingChart({ data, t }: SpendingChartProps) {
           <Bar
             dataKey="spent"
             name={t('spent')}
-            fill="#a855f7"
+            fill="#8b5cf6"
             radius={[6, 6, 0, 0]}
             maxBarSize={50}
           />

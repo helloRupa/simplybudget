@@ -99,7 +99,7 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           }
-          color="purple"
+          color="teal"
         />
 
         {/* Spent this week */}
@@ -146,21 +146,21 @@ export default function Dashboard() {
       </div>
 
       {/* Budget Progress Bar */}
-      <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-5">
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-purple-200">{t('weeklyBudget')}</span>
-          <span className="text-sm text-purple-300">
+          <span className="text-sm font-medium text-slate-300">{t('weeklyBudget')}</span>
+          <span className="text-sm text-amber-300 font-semibold">
             {formatCurrency(stats.spentThisWeek)} / {formatCurrency(stats.weeklyBudget)}
           </span>
         </div>
-        <div className="w-full bg-purple-900/50 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               budgetPercentage > 90
                 ? 'bg-red-500'
                 : budgetPercentage > 70
                 ? 'bg-amber-500'
-                : 'bg-green-500'
+                : 'bg-teal-400'
             }`}
             style={{ width: `${Math.min(100, budgetPercentage)}%` }}
           />
@@ -168,19 +168,19 @@ export default function Dashboard() {
       </div>
 
       {state.expenses.length === 0 ? (
-        <div className="bg-purple-800/20 rounded-2xl border border-purple-600/20 p-12 text-center">
-          <p className="text-purple-300 text-lg">{t('noExpensesYet')}</p>
+        <div className="bg-slate-800/30 rounded-2xl border border-slate-600/20 p-12 text-center">
+          <p className="text-slate-400 text-lg">{t('noExpensesYet')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Spending Over Time Chart */}
-          <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-5">
+          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
             <h3 className="text-md font-semibold text-white mb-4">{t('budgetVsSpending')}</h3>
             <SpendingChart data={stats.weeklyChartData} t={t} />
           </div>
 
           {/* Top Categories */}
-          <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-5">
+          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
             <h3 className="text-md font-semibold text-white mb-4">{t('topCategories')}</h3>
             <div className="space-y-3">
               {stats.topCategories.map(([category, amount]) => {
@@ -193,11 +193,11 @@ export default function Dashboard() {
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: getCategoryColor(category) }}
                         />
-                        <span className="text-sm text-purple-100">{category}</span>
+                        <span className="text-sm text-slate-200">{category}</span>
                       </div>
-                      <span className="text-sm font-semibold text-white">{formatCurrency(amount)}</span>
+                      <span className="text-sm font-semibold text-amber-300">{formatCurrency(amount)}</span>
                     </div>
-                    <div className="w-full bg-purple-900/50 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -206,18 +206,18 @@ export default function Dashboard() {
                         }}
                       />
                     </div>
-                    <p className="text-xs text-purple-400 mt-0.5">{percentage.toFixed(1)}%</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{percentage.toFixed(1)}%</p>
                   </div>
                 );
               })}
               {stats.topCategories.length === 0 && (
-                <p className="text-purple-400 text-sm text-center py-4">{t('noExpenses')}</p>
+                <p className="text-slate-500 text-sm text-center py-4">{t('noExpenses')}</p>
               )}
             </div>
           </div>
 
           {/* Monthly Spending by Category */}
-          <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-5 lg:col-span-2">
+          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5 lg:col-span-2">
             <h3 className="text-md font-semibold text-white mb-4">{t('monthlySpending')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {Object.entries(stats.monthlyCategoryTotals)
@@ -225,7 +225,7 @@ export default function Dashboard() {
                 .map(([category, amount]) => (
                   <div
                     key={category}
-                    className="bg-purple-900/40 rounded-xl p-3 text-center border border-purple-600/20"
+                    className="bg-slate-700/40 rounded-xl p-3 text-center border border-slate-600/20"
                   >
                     <div
                       className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold"
@@ -233,12 +233,12 @@ export default function Dashboard() {
                     >
                       {category[0]}
                     </div>
-                    <p className="text-xs text-purple-300 truncate">{category}</p>
-                    <p className="text-sm font-bold text-white mt-1">{formatCurrency(amount)}</p>
+                    <p className="text-xs text-slate-400 truncate">{category}</p>
+                    <p className="text-sm font-bold text-amber-300 mt-1">{formatCurrency(amount)}</p>
                   </div>
                 ))}
               {Object.keys(stats.monthlyCategoryTotals).length === 0 && (
-                <p className="text-purple-400 text-sm col-span-full text-center py-4">{t('noExpenses')}</p>
+                <p className="text-slate-500 text-sm col-span-full text-center py-4">{t('noExpenses')}</p>
               )}
             </div>
           </div>
@@ -253,31 +253,38 @@ interface SummaryCardProps {
   value: string;
   subtitle: string;
   icon: React.ReactNode;
-  color: 'purple' | 'green' | 'red' | 'amber';
+  color: 'teal' | 'green' | 'red' | 'amber';
 }
 
 function SummaryCard({ title, value, subtitle, icon, color }: SummaryCardProps) {
   const colorStyles = {
-    purple: 'from-purple-600/30 to-purple-800/30 border-purple-500/30',
+    teal: 'from-teal-600/20 to-teal-800/20 border-teal-400/30',
     green: 'from-green-600/20 to-green-800/20 border-green-500/30',
     red: 'from-red-600/20 to-red-800/20 border-red-500/30',
     amber: 'from-amber-600/20 to-amber-800/20 border-amber-500/30',
   };
 
   const iconColors = {
-    purple: 'text-purple-300',
+    teal: 'text-teal-300',
     green: 'text-green-400',
     red: 'text-red-400',
     amber: 'text-amber-400',
+  };
+
+  const valueColors = {
+    teal: 'text-teal-300',
+    green: 'text-green-400',
+    red: 'text-red-400',
+    amber: 'text-amber-300',
   };
 
   return (
     <div className={`bg-gradient-to-br ${colorStyles[color]} backdrop-blur-sm rounded-2xl border p-5`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-purple-300 uppercase tracking-wider">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
-          <p className="text-xs text-purple-400 mt-1">{subtitle}</p>
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
+          <p className={`text-2xl font-bold mt-1 ${valueColors[color]}`}>{value}</p>
+          <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
         </div>
         <div className={`${iconColors[color]} opacity-60`}>{icon}</div>
       </div>

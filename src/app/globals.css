@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #1e1040;
-  --foreground: #f3e8ff;
+  --background: #0f1729;
+  --foreground: #e2e8f0;
 }
 
 body {
@@ -20,21 +20,21 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e1040;
+  background: #0f1729;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #7e22ce;
+  background: #2dd4bf;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #5eead4;
 }
 
 /* Date input styling for dark theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7) sepia(1) saturate(3) hue-rotate(220deg);
+  filter: invert(0.7) sepia(1) saturate(3) hue-rotate(140deg);
 }
 
 /* Number input - hide spinners */
@@ -50,8 +50,8 @@ input[type="number"] {
 
 /* Select styling */
 select option {
-  background-color: #3b0764;
-  color: #f3e8ff;
+  background-color: #1e293b;
+  color: #e2e8f0;
 }
 
 /* Smooth transitions */

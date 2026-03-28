@@ -77,7 +77,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   }
 
   return (
-    <div className="bg-purple-800/40 backdrop-blur-sm rounded-2xl border border-purple-600/30 p-6">
+    <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
       <h2 className="text-lg font-semibold text-white mb-4">
         {editingExpense ? t('editExpense') : t('addExpense')}
       </h2>
@@ -85,18 +85,18 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-purple-200 mb-1">{t('amount')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">{t('amount')}</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-300">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">$</span>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className={`w-full bg-purple-900/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${
-                  errors.amount ? 'border-red-400' : 'border-purple-600/50'
-                } focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-400`}
+                className={`w-full bg-slate-700/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${
+                  errors.amount ? 'border-red-400' : 'border-slate-500/50'
+                } focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500`}
                 placeholder="0.00"
               />
             </div>
@@ -105,13 +105,13 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-purple-200 mb-1">{t('category')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">{t('category')}</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className={`w-full bg-purple-900/50 text-white rounded-xl px-4 py-2.5 border ${
-                errors.category ? 'border-red-400' : 'border-purple-600/50'
-              } focus:outline-none focus:ring-2 focus:ring-purple-400`}
+              className={`w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border ${
+                errors.category ? 'border-red-400' : 'border-slate-500/50'
+              } focus:outline-none focus:ring-2 focus:ring-teal-400`}
             >
               <option value="">{t('selectCategory')}</option>
               {state.categories.map((cat) => (
@@ -125,26 +125,26 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-purple-200 mb-1">{t('date')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">{t('date')}</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className={`w-full bg-purple-900/50 text-white rounded-xl px-4 py-2.5 border ${
-                errors.date ? 'border-red-400' : 'border-purple-600/50'
-              } focus:outline-none focus:ring-2 focus:ring-purple-400`}
+              className={`w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border ${
+                errors.date ? 'border-red-400' : 'border-slate-500/50'
+              } focus:outline-none focus:ring-2 focus:ring-teal-400`}
             />
             {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date}</p>}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-purple-200 mb-1">{t('description')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">{t('description')}</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-purple-900/50 text-white rounded-xl px-4 py-2.5 border border-purple-600/50 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-purple-400"
+              className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500"
               placeholder={t('descriptionPlaceholder')}
             />
           </div>
@@ -155,14 +155,14 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
             <button
               type="button"
               onClick={onDone}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium text-purple-200 hover:text-white bg-purple-700/30 hover:bg-purple-700/50 transition-colors"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-600/30 hover:bg-slate-600/50 transition-colors"
             >
               {t('cancel')}
             </button>
           )}
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/25 transition-all hover:shadow-purple-500/30"
+            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 transition-all hover:shadow-teal-400/30"
           >
             {editingExpense ? t('update') : t('addExpense')}
           </button>
