@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import { Expense, FilterState, SortState } from '@/types';
-import { formatCurrency } from '@/utils/currency';
 import { formatDate, isInRange } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import ExpenseFilters from './ExpenseFilters';
@@ -14,7 +13,7 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
-  const { state, deleteExpense, t } = useBudget();
+  const { state, deleteExpense, t, tc, fc } = useBudget();
   const [filters, setFilters] = useState<FilterState>({
     dateFrom: '',
     dateTo: '',
@@ -32,7 +31,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
         const q = filters.searchQuery.toLowerCase();
         return (
           expense.description.toLowerCase().includes(q) ||
-          expense.category.toLowerCase().includes(q) ||
+          tc(expense.category).toLowerCase().includes(q) ||
           expense.amount.toString().includes(q)
         );
       }
@@ -142,14 +141,14 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                           className="w-2 h-2 rounded-full mr-1.5"
                           style={{ backgroundColor: getCategoryColor(expense.category) }}
                         />
-                        {expense.category}
+                        {tc(expense.category)}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-300">
                       {expense.description || <span className="text-slate-600 italic">—</span>}
                     </td>
                     <td className="px-5 py-3 text-sm text-right font-semibold text-amber-300">
-                      {formatCurrency(expense.amount)}
+                      {fc(expense.amount)}
                     </td>
                     <td className="px-5 py-3 text-right">
                       {deletingId === expense.id ? (
@@ -204,11 +203,11 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                       style={{ backgroundColor: getCategoryColor(expense.category) + '33', border: `1px solid ${getCategoryColor(expense.category)}55` }}
                     >
                       <span className="w-2 h-2 rounded-full mr-1.5" style={{ backgroundColor: getCategoryColor(expense.category) }} />
-                      {expense.category}
+                      {tc(expense.category)}
                     </span>
                     <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
                   </div>
-                  <p className="text-lg font-bold text-amber-300">{formatCurrency(expense.amount)}</p>
+                  <p className="text-lg font-bold text-amber-300">{fc(expense.amount)}</p>
                 </div>
                 {expense.description && (
                   <p className="text-sm text-slate-300 mb-3">{expense.description}</p>

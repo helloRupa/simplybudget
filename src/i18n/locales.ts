@@ -74,6 +74,7 @@ const en = {
   categoryExists: 'Category already exists.',
   deleteCategory: 'Delete',
   language: 'Language',
+  currency: 'Currency',
   exportData: 'Export Data',
   exportCSV: 'Export as CSV',
 
@@ -154,6 +155,7 @@ const es: typeof en = {
   categoryExists: 'La categoría ya existe.',
   deleteCategory: 'Eliminar',
   language: 'Idioma',
+  currency: 'Moneda',
   exportData: 'Exportar Datos',
   exportCSV: 'Exportar como CSV',
   amountRequired: 'El monto es requerido.',
@@ -230,6 +232,7 @@ const fr: typeof en = {
   categoryExists: 'La catégorie existe déjà.',
   deleteCategory: 'Supprimer',
   language: 'Langue',
+  currency: 'Devise',
   exportData: 'Exporter les Données',
   exportCSV: 'Exporter en CSV',
   amountRequired: 'Le montant est requis.',
@@ -251,3 +254,30 @@ const fr: typeof en = {
 
 export const locales: Record<LocaleKey, typeof en> = { en, es, fr };
 export type TranslationKey = keyof typeof en;
+
+export const categoryTranslations: Record<LocaleKey, Record<string, string>> = {
+  en: {
+    Food: 'Food',
+    Transportation: 'Transportation',
+    Entertainment: 'Entertainment',
+    Shopping: 'Shopping',
+    Bills: 'Bills',
+    Other: 'Other',
+  },
+  es: {
+    Food: 'Comida',
+    Transportation: 'Transporte',
+    Entertainment: 'Entretenimiento',
+    Shopping: 'Compras',
+    Bills: 'Facturas',
+    Other: 'Otros',
+  },
+  fr: {
+    Food: 'Alimentation',
+    Transportation: 'Transport',
+    Entertainment: 'Divertissement',
+    Shopping: 'Achats',
+    Bills: 'Factures',
+    Other: 'Autre',
+  },
+};

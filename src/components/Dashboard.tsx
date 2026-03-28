@@ -2,14 +2,13 @@
 
 import { useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { formatCurrency } from '@/utils/currency';
 import { getWeekRange, getMonthRange, getWeekRanges, toISODate } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import SpendingChart from './SpendingChart';
 import { parseISO, isWithinInterval, format } from 'date-fns';
 
 export default function Dashboard() {
-  const { state, t } = useBudget();
+  const { state, t, tc, fc, currencySymbol } = useBudget();
 
   const stats = useMemo(() => {
     const { start: weekStart, end: weekEnd } = getWeekRange();
@@ -106,7 +105,7 @@ export default function Dashboard() {
         {/* Weekly Budget */}
         <SummaryCard
           title={t('weeklyBudget')}
-          value={formatCurrency(stats.weeklyBudget)}
+          value={fc(stats.weeklyBudget)}
           subtitle={t('perWeek')}
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -119,7 +118,7 @@ export default function Dashboard() {
         {/* Spent this week */}
         <SummaryCard
           title={t('spentThisWeek')}
-          value={formatCurrency(stats.spentThisWeek)}
+          value={fc(stats.spentThisWeek)}
           subtitle={`${budgetPercentage.toFixed(0)}% ${t('of')} ${t('budget').toLowerCase()}`}
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -132,7 +131,7 @@ export default function Dashboard() {
         {/* Remaining / Saved this week */}
         <SummaryCard
           title={stats.remainingThisWeek >= 0 ? t('remainingThisWeek') : t('overBudgetThisWeek')}
-          value={formatCurrency(Math.abs(stats.remainingThisWeek))}
+          value={fc(Math.abs(stats.remainingThisWeek))}
           subtitle={t('thisWeek')}
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -148,7 +147,7 @@ export default function Dashboard() {
         {/* Total saved all time */}
         <SummaryCard
           title={stats.totalSavedAllTime >= 0 ? t('totalSavedAllTime') : t('totalOverspentAllTime')}
-          value={formatCurrency(Math.abs(stats.totalSavedAllTime))}
+          value={fc(Math.abs(stats.totalSavedAllTime))}
           subtitle={stats.totalSavedAllTime >= 0 ? t('allTime') : t('allTime')}
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -164,7 +163,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-slate-300">{t('weeklyBudget')}</span>
           <span className="text-sm text-amber-300 font-semibold">
-            {formatCurrency(stats.spentThisWeek)} / {formatCurrency(stats.weeklyBudget)}
+            {fc(stats.spentThisWeek)} / {fc(stats.weeklyBudget)}
           </span>
         </div>
         <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
@@ -190,7 +189,7 @@ export default function Dashboard() {
           {/* Spending Over Time Chart */}
           <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
             <h3 className="text-md font-semibold text-white mb-4">{t('budgetVsSpending')}</h3>
-            <SpendingChart data={stats.weeklyChartData} t={t} />
+            <SpendingChart data={stats.weeklyChartData} t={t} fc={fc} currencySymbol={currencySymbol} />
           </div>
 
           {/* Top Categories */}
@@ -207,9 +206,9 @@ export default function Dashboard() {
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: getCategoryColor(category) }}
                         />
-                        <span className="text-sm text-slate-200">{category}</span>
+                        <span className="text-sm text-slate-200">{tc(category)}</span>
                       </div>
-                      <span className="text-sm font-semibold text-amber-300">{formatCurrency(amount)}</span>
+                      <span className="text-sm font-semibold text-amber-300">{fc(amount)}</span>
                     </div>
                     <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
                       <div
@@ -252,16 +251,16 @@ export default function Dashboard() {
                         className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold"
                         style={{ backgroundColor: getCategoryColor(category) }}
                       >
-                        {category[0]}
+                        {tc(category)[0]}
                       </div>
-                      <p className="text-xs text-slate-400 truncate">{category}</p>
+                      <p className="text-xs text-slate-400 truncate">{tc(category)}</p>
                       {future > 0 && current > 0 ? (
                         <div className="mt-1">
-                          <span className="text-sm font-bold text-amber-300">{formatCurrency(current)}</span>
-                          <span className="text-sm font-bold text-amber-300/40"> + {formatCurrency(future)}</span>
+                          <span className="text-sm font-bold text-amber-300">{fc(current)}</span>
+                          <span className="text-sm font-bold text-amber-300/40"> + {fc(future)}</span>
                         </div>
                       ) : (
-                        <p className="text-sm font-bold text-amber-300 mt-1">{formatCurrency(current + future)}</p>
+                        <p className="text-sm font-bold text-amber-300 mt-1">{fc(current + future)}</p>
                       )}
                     </div>
                   );

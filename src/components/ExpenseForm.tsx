@@ -12,7 +12,7 @@ interface ExpenseFormProps {
 }
 
 export default function ExpenseForm({ editingExpense, onDone, onToast }: ExpenseFormProps) {
-  const { state, addExpense, updateExpense, t } = useBudget();
+  const { state, addExpense, updateExpense, t, tc, currencySymbol } = useBudget();
 
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -87,7 +87,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">{t('amount')}</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">{currencySymbol}</span>
               <input
                 type="number"
                 step="0.01"
@@ -116,7 +116,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
               <option value="">{t('selectCategory')}</option>
               {state.categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat}
+                  {tc(cat)}
                 </option>
               ))}
             </select>

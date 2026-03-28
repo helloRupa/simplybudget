@@ -22,9 +22,11 @@ interface ChartData {
 interface SpendingChartProps {
   data: ChartData[];
   t: (key: TranslationKey) => string;
+  fc: (amount: number) => string;
+  currencySymbol: string;
 }
 
-export default function SpendingChart({ data, t }: SpendingChartProps) {
+export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingChartProps) {
   if (data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-slate-500">
@@ -50,7 +52,7 @@ export default function SpendingChart({ data, t }: SpendingChartProps) {
             tick={{ fill: '#94a3b8', fontSize: 12 }}
             axisLine={{ stroke: '#475569' }}
             tickLine={{ stroke: '#475569' }}
-            tickFormatter={(v) => `$${v}`}
+            tickFormatter={(v) => `${currencySymbol}${v}`}
           />
           <Tooltip
             contentStyle={{
@@ -59,7 +61,7 @@ export default function SpendingChart({ data, t }: SpendingChartProps) {
               borderRadius: '12px',
               color: '#fff',
             }}
-            formatter={(value) => [`$${Number(value).toFixed(2)}`, '']}
+            formatter={(value) => [fc(Number(value)), '']}
             labelStyle={{ color: '#94a3b8' }}
             cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
           />

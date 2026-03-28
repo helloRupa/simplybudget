@@ -9,7 +9,7 @@ interface ExpenseFiltersProps {
 }
 
 export default function ExpenseFilters({ filters, onFilterChange }: ExpenseFiltersProps) {
-  const { state, t } = useBudget();
+  const { state, t, tc } = useBudget();
 
   function updateFilter(key: keyof FilterState, value: string) {
     onFilterChange({ ...filters, [key]: value });
@@ -63,7 +63,7 @@ export default function ExpenseFilters({ filters, onFilterChange }: ExpenseFilte
         >
           <option value="">{t('allCategories')}</option>
           {state.categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+            <option key={cat} value={cat}>{tc(cat)}</option>
           ))}
         </select>
 

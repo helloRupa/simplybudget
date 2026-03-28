@@ -2,16 +2,15 @@
 
 import { useState } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { formatCurrency } from '@/utils/currency';
 import { exportToCSV } from '@/utils/csv';
-import { DEFAULT_CATEGORIES } from '@/utils/constants';
+import { DEFAULT_CATEGORIES, SUPPORTED_CURRENCIES, CurrencyCode } from '@/utils/constants';
 
 interface SettingsProps {
   onToast: (message: string, type: 'success' | 'error') => void;
 }
 
 export default function Settings({ onToast }: SettingsProps) {
-  const { state, setWeeklyBudget, addCategory, deleteCategory, t } = useBudget();
+  const { state, setWeeklyBudget, addCategory, deleteCategory, setCurrency, t, tc, fc, currencySymbol } = useBudget();
   const [budgetInput, setBudgetInput] = useState(state.weeklyBudget.toString());
   const [newCategory, setNewCategory] = useState('');
   const [budgetError, setBudgetError] = useState('');
@@ -58,7 +57,7 @@ export default function Settings({ onToast }: SettingsProps) {
         <h2 className="text-lg font-semibold text-white mb-4">{t('setBudget')}</h2>
         <form onSubmit={handleBudgetSubmit} className="flex gap-3">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">{currencySymbol}</span>
             <input
               type="number"
               step="0.01"
@@ -80,8 +79,22 @@ export default function Settings({ onToast }: SettingsProps) {
         </form>
         {budgetError && <p className="text-red-400 text-xs mt-2">{budgetError}</p>}
         <p className="text-slate-500 text-xs mt-2">
-          {t('weeklyBudget')}: {formatCurrency(state.weeklyBudget)}
+          {t('weeklyBudget')}: {fc(state.weeklyBudget)}
         </p>
+      </div>
+
+      {/* Currency */}
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">{t('currency')}</h2>
+        <select
+          value={state.currency}
+          onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
+          className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
+        >
+          {Object.entries(SUPPORTED_CURRENCIES).map(([code, label]) => (
+            <option key={code} value={code}>{label}</option>
+          ))}
+        </select>
       </div>
 
       {/* Category Management */}
@@ -108,7 +121,7 @@ export default function Settings({ onToast }: SettingsProps) {
               key={cat}
               className="flex items-center gap-2 bg-slate-700/40 rounded-xl px-3 py-2 border border-slate-600/20"
             >
-              <span className="text-sm text-slate-200">{cat}</span>
+              <span className="text-sm text-slate-200">{tc(cat)}</span>
               {!isDefaultCategory(cat) && (
                 <button
                   onClick={() => deleteCategory(cat)}

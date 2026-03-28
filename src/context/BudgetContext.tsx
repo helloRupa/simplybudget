@@ -2,10 +2,11 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
 import { Expense } from '@/types';
-import { DEFAULT_CATEGORIES, STORAGE_KEYS } from '@/utils/constants';
+import { DEFAULT_CATEGORIES, STORAGE_KEYS, CurrencyCode } from '@/utils/constants';
+import { formatCurrency, getCurrencySymbol } from '@/utils/currency';
 import { getItem, setItem } from '@/utils/storage';
 import { toISODate } from '@/utils/dates';
-import { locales, LocaleKey, TranslationKey } from '@/i18n/locales';
+import { locales, LocaleKey, TranslationKey, categoryTranslations } from '@/i18n/locales';
 import { v4 as uuidv4 } from 'uuid';
 
 interface State {
@@ -14,6 +15,7 @@ interface State {
   categories: string[];
   firstUseDate: string;
   locale: LocaleKey;
+  currency: CurrencyCode;
 }
 
 type Action =
@@ -24,7 +26,8 @@ type Action =
   | { type: 'SET_WEEKLY_BUDGET'; payload: number }
   | { type: 'ADD_CATEGORY'; payload: string }
   | { type: 'DELETE_CATEGORY'; payload: string }
-  | { type: 'SET_LOCALE'; payload: LocaleKey };
+  | { type: 'SET_LOCALE'; payload: LocaleKey }
+  | { type: 'SET_CURRENCY'; payload: CurrencyCode };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -55,6 +58,8 @@ function reducer(state: State, action: Action): State {
       };
     case 'SET_LOCALE':
       return { ...state, locale: action.payload };
+    case 'SET_CURRENCY':
+      return { ...state, currency: action.payload };
     default:
       return state;
   }
@@ -66,6 +71,7 @@ const initialState: State = {
   categories: [...DEFAULT_CATEGORIES],
   firstUseDate: toISODate(new Date()),
   locale: 'en',
+  currency: 'USD',
 };
 
 interface BudgetContextValue {
@@ -77,7 +83,11 @@ interface BudgetContextValue {
   addCategory: (name: string) => boolean;
   deleteCategory: (name: string) => void;
   setLocale: (locale: LocaleKey) => void;
+  setCurrency: (currency: CurrencyCode) => void;
   t: (key: TranslationKey) => string;
+  tc: (category: string) => string;
+  fc: (amount: number) => string;
+  currencySymbol: string;
   isLoaded: boolean;
 }
 
@@ -96,6 +106,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       categories: getItem<string[]>(STORAGE_KEYS.CATEGORIES, [...DEFAULT_CATEGORIES]),
       firstUseDate: getItem<string>(STORAGE_KEYS.FIRST_USE_DATE, today),
       locale: getItem<LocaleKey>(STORAGE_KEYS.LOCALE, 'en'),
+      currency: getItem<CurrencyCode>(STORAGE_KEYS.CURRENCY, 'USD'),
     };
     // Set first use date if not set
     if (!localStorage.getItem(STORAGE_KEYS.FIRST_USE_DATE)) {
@@ -112,6 +123,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     setItem(STORAGE_KEYS.WEEKLY_BUDGET, state.weeklyBudget);
     setItem(STORAGE_KEYS.CATEGORIES, state.categories);
     setItem(STORAGE_KEYS.LOCALE, state.locale);
+    setItem(STORAGE_KEYS.CURRENCY, state.currency);
   }, [state, isLoaded]);
 
   const addExpense = useCallback((expense: Omit<Expense, 'id' | 'createdAt'>) => {
@@ -153,12 +165,34 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'SET_LOCALE', payload: locale });
   }, []);
 
+  const setCurrency = useCallback((currency: CurrencyCode) => {
+    dispatch({ type: 'SET_CURRENCY', payload: currency });
+  }, []);
+
   const t = useCallback(
     (key: TranslationKey): string => {
       return locales[state.locale]?.[key] ?? locales.en[key] ?? key;
     },
     [state.locale]
   );
+
+  const tc = useCallback(
+    (category: string): string => {
+      return categoryTranslations[state.locale]?.[category] ?? category;
+    },
+    [state.locale]
+  );
+
+  const LOCALE_TO_INTL: Record<LocaleKey, string> = { en: 'en-US', es: 'es', fr: 'fr' };
+
+  const fc = useCallback(
+    (amount: number): string => {
+      return formatCurrency(amount, LOCALE_TO_INTL[state.locale], state.currency);
+    },
+    [state.locale, state.currency]
+  );
+
+  const currencySymbol = getCurrencySymbol(state.currency, LOCALE_TO_INTL[state.locale]);
 
   return (
     <BudgetContext.Provider
@@ -171,7 +205,11 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         addCategory,
         deleteCategory,
         setLocale,
+        setCurrency,
         t,
+        tc,
+        fc,
+        currencySymbol,
         isLoaded,
       }}
     >
