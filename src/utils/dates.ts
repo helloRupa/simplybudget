@@ -1,0 +1,74 @@
+import {
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  format,
+  parseISO,
+  isWithinInterval,
+  differenceInWeeks,
+  addWeeks,
+} from 'date-fns';
+
+export function getWeekRange(date: Date = new Date()) {
+  const start = startOfWeek(date, { weekStartsOn: 1 }); // Monday
+  const end = endOfWeek(date, { weekStartsOn: 1 }); // Sunday
+  return { start, end };
+}
+
+export function getMonthRange(date: Date = new Date()) {
+  return { start: startOfMonth(date), end: endOfMonth(date) };
+}
+
+export function formatDate(dateStr: string, fmt = 'MMM d, yyyy'): string {
+  try {
+    return format(parseISO(dateStr), fmt);
+  } catch {
+    return dateStr;
+  }
+}
+
+export function isInRange(dateStr: string, from: string, to: string): boolean {
+  if (!from && !to) return true;
+  try {
+    const date = parseISO(dateStr);
+    const start = from ? parseISO(from) : new Date(0);
+    const end = to ? parseISO(to) : new Date(9999, 11, 31);
+    return isWithinInterval(date, { start, end });
+  } catch {
+    return true;
+  }
+}
+
+export function toISODate(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+export function getTotalWeeksSinceStart(firstUseDate: string): number {
+  try {
+    const start = parseISO(firstUseDate);
+    const now = new Date();
+    return Math.max(1, differenceInWeeks(now, start) + 1);
+  } catch {
+    return 1;
+  }
+}
+
+export function getWeekRanges(firstUseDate: string): Array<{ start: Date; end: Date }> {
+  try {
+    const startDate = startOfWeek(parseISO(firstUseDate), { weekStartsOn: 1 });
+    const now = new Date();
+    const weeks: Array<{ start: Date; end: Date }> = [];
+    let current = startDate;
+    while (current <= now) {
+      weeks.push({
+        start: current,
+        end: endOfWeek(current, { weekStartsOn: 1 }),
+      });
+      current = addWeeks(current, 1);
+    }
+    return weeks;
+  } catch {
+    return [];
+  }
+}
