@@ -145,7 +145,14 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                       </span>
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-300">
-                      {expense.description || <span className="text-slate-600 italic">—</span>}
+                      <span className="inline-flex items-center gap-1.5">
+                        {expense.description || <span className="text-slate-600 italic">—</span>}
+                        {expense.recurringExpenseId && (
+                          <svg className="w-3.5 h-3.5 text-teal-400/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        )}
+                      </span>
                     </td>
                     <td className="px-5 py-3 text-sm text-right font-semibold text-amber-300">
                       {fc(expense.amount)}
@@ -209,8 +216,15 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                   </div>
                   <p className="text-lg font-bold text-amber-300">{fc(expense.amount)}</p>
                 </div>
-                {expense.description && (
-                  <p className="text-sm text-slate-300 mb-3">{expense.description}</p>
+                {(expense.description || expense.recurringExpenseId) && (
+                  <p className="text-sm text-slate-300 mb-3 inline-flex items-center gap-1.5">
+                    {expense.description}
+                    {expense.recurringExpenseId && (
+                      <svg className="w-3.5 h-3.5 text-teal-400/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    )}
+                  </p>
                 )}
                 <div className="flex gap-2 justify-end">
                   {deletingId === expense.id ? (

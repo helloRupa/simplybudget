@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import { exportToCSV } from '@/utils/csv';
 import { DEFAULT_CATEGORIES, SUPPORTED_CURRENCIES, CurrencyCode } from '@/utils/constants';
+import RecurringExpenseManager from './RecurringExpenseManager';
 
 interface SettingsProps {
   onToast: (message: string, type: 'success' | 'error') => void;
@@ -96,6 +97,9 @@ export default function Settings({ onToast }: SettingsProps) {
           ))}
         </select>
       </div>
+
+      {/* Recurring Expenses */}
+      <RecurringExpenseManager onToast={onToast} />
 
       {/* Category Management */}
       <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">

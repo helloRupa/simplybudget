@@ -96,6 +96,22 @@ const en = {
   delete: 'Delete',
   close: 'Close',
   perWeek: '/ week',
+
+  // Recurring Expenses
+  recurringExpenses: 'Recurring Expenses',
+  addRecurringExpense: 'Add Recurring Expense',
+  editRecurringExpense: 'Edit Recurring Expense',
+  dayOfMonth: 'Day of Month',
+  startDate: 'Start Date',
+  endDate: 'End Date (optional)',
+  noEndDate: 'No end date',
+  recurringExpenseAdded: 'Recurring expense added!',
+  recurringExpenseUpdated: 'Recurring expense updated!',
+  recurringExpenseDeleted: 'Recurring expense deleted.',
+  noRecurringExpenses: 'No recurring expenses set up.',
+  recurring: 'Recurring',
+  monthly: 'monthly',
+  onDay: 'on day',
 };
 
 const es: typeof en = {
@@ -173,6 +189,20 @@ const es: typeof en = {
   delete: 'Eliminar',
   close: 'Cerrar',
   perWeek: '/ semana',
+  recurringExpenses: 'Gastos Recurrentes',
+  addRecurringExpense: 'Agregar Gasto Recurrente',
+  editRecurringExpense: 'Editar Gasto Recurrente',
+  dayOfMonth: 'Día del Mes',
+  startDate: 'Fecha de Inicio',
+  endDate: 'Fecha de Fin (opcional)',
+  noEndDate: 'Sin fecha de fin',
+  recurringExpenseAdded: '¡Gasto recurrente agregado!',
+  recurringExpenseUpdated: '¡Gasto recurrente actualizado!',
+  recurringExpenseDeleted: 'Gasto recurrente eliminado.',
+  noRecurringExpenses: 'No hay gastos recurrentes configurados.',
+  recurring: 'Recurrente',
+  monthly: 'mensual',
+  onDay: 'el día',
 };
 
 const fr: typeof en = {
@@ -250,6 +280,20 @@ const fr: typeof en = {
   delete: 'Supprimer',
   close: 'Fermer',
   perWeek: '/ semaine',
+  recurringExpenses: 'Dépenses Récurrentes',
+  addRecurringExpense: 'Ajouter une Dépense Récurrente',
+  editRecurringExpense: 'Modifier la Dépense Récurrente',
+  dayOfMonth: 'Jour du Mois',
+  startDate: 'Date de Début',
+  endDate: 'Date de Fin (optionnel)',
+  noEndDate: 'Pas de date de fin',
+  recurringExpenseAdded: 'Dépense récurrente ajoutée!',
+  recurringExpenseUpdated: 'Dépense récurrente mise à jour!',
+  recurringExpenseDeleted: 'Dépense récurrente supprimée.',
+  noRecurringExpenses: 'Aucune dépense récurrente configurée.',
+  recurring: 'Récurrent',
+  monthly: 'mensuel',
+  onDay: 'le jour',
 };
 
 export const locales: Record<LocaleKey, typeof en> = { en, es, fr };

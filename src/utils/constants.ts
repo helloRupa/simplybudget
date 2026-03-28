@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   FIRST_USE_DATE: 'simplybudget_first_use_date',
   LOCALE: 'simplybudget_locale',
   CURRENCY: 'simplybudget_currency',
+  RECURRING_EXPENSES: 'simplybudget_recurring_expenses',
 } as const;
 
 export type CurrencyCode = 'USD' | 'GBP' | 'EUR' | 'CAD' | 'AUD' | 'JPY' | 'INR' | 'MXN' | 'BRL' | 'CHF';

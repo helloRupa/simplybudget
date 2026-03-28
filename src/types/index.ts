@@ -5,6 +5,19 @@ export interface Expense {
   description: string;
   date: string; // ISO date string YYYY-MM-DD
   createdAt: string; // ISO datetime
+  recurringExpenseId?: string; // links to RecurringExpense that generated this
+}
+
+export interface RecurringExpense {
+  id: string;
+  amount: number;
+  category: string;
+  description: string;
+  dayOfMonth: number; // 1-31
+  createdAt: string; // ISO datetime
+  startDate: string; // ISO date YYYY-MM-DD — first month this applies
+  endDate: string | null; // ISO date or null (indefinite)
+  lastGeneratedDate: string | null; // ISO date of most recent generated expense
 }
 
 export interface WeeklyBudget {

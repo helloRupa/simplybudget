@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
-import { Expense } from '@/types';
+import { Expense, RecurringExpense } from '@/types';
+import { generatePendingExpenses } from '@/utils/recurring';
 import { DEFAULT_CATEGORIES, STORAGE_KEYS, CurrencyCode } from '@/utils/constants';
 import { formatCurrency, getCurrencySymbol } from '@/utils/currency';
 import { getItem, setItem } from '@/utils/storage';
@@ -16,6 +17,7 @@ interface State {
   firstUseDate: string;
   locale: LocaleKey;
   currency: CurrencyCode;
+  recurringExpenses: RecurringExpense[];
 }
 
 type Action =
@@ -27,7 +29,10 @@ type Action =
   | { type: 'ADD_CATEGORY'; payload: string }
   | { type: 'DELETE_CATEGORY'; payload: string }
   | { type: 'SET_LOCALE'; payload: LocaleKey }
-  | { type: 'SET_CURRENCY'; payload: CurrencyCode };
+  | { type: 'SET_CURRENCY'; payload: CurrencyCode }
+  | { type: 'ADD_RECURRING_EXPENSE'; payload: RecurringExpense }
+  | { type: 'UPDATE_RECURRING_EXPENSE'; payload: RecurringExpense }
+  | { type: 'DELETE_RECURRING_EXPENSE'; payload: string };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -60,6 +65,20 @@ function reducer(state: State, action: Action): State {
       return { ...state, locale: action.payload };
     case 'SET_CURRENCY':
       return { ...state, currency: action.payload };
+    case 'ADD_RECURRING_EXPENSE':
+      return { ...state, recurringExpenses: [...state.recurringExpenses, action.payload] };
+    case 'UPDATE_RECURRING_EXPENSE':
+      return {
+        ...state,
+        recurringExpenses: state.recurringExpenses.map((r) =>
+          r.id === action.payload.id ? action.payload : r
+        ),
+      };
+    case 'DELETE_RECURRING_EXPENSE':
+      return {
+        ...state,
+        recurringExpenses: state.recurringExpenses.filter((r) => r.id !== action.payload),
+      };
     default:
       return state;
   }
@@ -72,6 +91,7 @@ const initialState: State = {
   firstUseDate: toISODate(new Date()),
   locale: 'en',
   currency: 'USD',
+  recurringExpenses: [],
 };
 
 interface BudgetContextValue {
@@ -84,6 +104,9 @@ interface BudgetContextValue {
   deleteCategory: (name: string) => void;
   setLocale: (locale: LocaleKey) => void;
   setCurrency: (currency: CurrencyCode) => void;
+  addRecurringExpense: (expense: Omit<RecurringExpense, 'id' | 'createdAt' | 'lastGeneratedDate'>) => void;
+  updateRecurringExpense: (expense: RecurringExpense) => void;
+  deleteRecurringExpense: (id: string) => void;
   t: (key: TranslationKey) => string;
   tc: (category: string) => string;
   fc: (amount: number) => string;
@@ -109,11 +132,27 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       firstUseDate: getItem<string>(STORAGE_KEYS.FIRST_USE_DATE, today),
       locale: getItem<LocaleKey>(STORAGE_KEYS.LOCALE, 'en'),
       currency: getItem<CurrencyCode>(STORAGE_KEYS.CURRENCY, 'USD'),
+      recurringExpenses: getItem<RecurringExpense[]>(STORAGE_KEYS.RECURRING_EXPENSES, []),
     };
     // Set first use date if not set
     if (!localStorage.getItem(STORAGE_KEYS.FIRST_USE_DATE)) {
       setItem(STORAGE_KEYS.FIRST_USE_DATE, today);
     }
+
+    // Generate any pending recurring expenses
+    if (loaded.recurringExpenses.length > 0) {
+      const { newExpenses, updatedRecurringExpenses } = generatePendingExpenses(
+        loaded.recurringExpenses,
+        new Date(),
+      );
+      if (newExpenses.length > 0) {
+        loaded.expenses = [...newExpenses, ...loaded.expenses];
+        loaded.recurringExpenses = updatedRecurringExpenses;
+        setItem(STORAGE_KEYS.EXPENSES, loaded.expenses);
+        setItem(STORAGE_KEYS.RECURRING_EXPENSES, loaded.recurringExpenses);
+      }
+    }
+
     dispatch({ type: 'SET_INITIAL', payload: loaded });
     setIsLoaded(true);
   }, []);
@@ -126,6 +165,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     setItem(STORAGE_KEYS.CATEGORIES, state.categories);
     setItem(STORAGE_KEYS.LOCALE, state.locale);
     setItem(STORAGE_KEYS.CURRENCY, state.currency);
+    setItem(STORAGE_KEYS.RECURRING_EXPENSES, state.recurringExpenses);
   }, [state, isLoaded]);
 
   const addExpense = useCallback((expense: Omit<Expense, 'id' | 'createdAt'>) => {
@@ -169,6 +209,35 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
   const setCurrency = useCallback((currency: CurrencyCode) => {
     dispatch({ type: 'SET_CURRENCY', payload: currency });
+  }, []);
+
+  const addRecurringExpense = useCallback((expense: Omit<RecurringExpense, 'id' | 'createdAt' | 'lastGeneratedDate'>) => {
+    const newRecurring: RecurringExpense = {
+      ...expense,
+      id: uuidv4(),
+      createdAt: new Date().toISOString(),
+      lastGeneratedDate: null,
+    };
+    dispatch({ type: 'ADD_RECURRING_EXPENSE', payload: newRecurring });
+
+    // Immediately generate any pending expenses for this new recurring expense
+    const { newExpenses, updatedRecurringExpenses } = generatePendingExpenses(
+      [newRecurring],
+      new Date(),
+    );
+    if (newExpenses.length > 0) {
+      newExpenses.forEach((exp) => dispatch({ type: 'ADD_EXPENSE', payload: exp }));
+      const updated = updatedRecurringExpenses[0];
+      dispatch({ type: 'UPDATE_RECURRING_EXPENSE', payload: updated });
+    }
+  }, []);
+
+  const updateRecurringExpense = useCallback((expense: RecurringExpense) => {
+    dispatch({ type: 'UPDATE_RECURRING_EXPENSE', payload: expense });
+  }, []);
+
+  const deleteRecurringExpense = useCallback((id: string) => {
+    dispatch({ type: 'DELETE_RECURRING_EXPENSE', payload: id });
   }, []);
 
   const t = useCallback(
@@ -216,6 +285,9 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         deleteCategory,
         setLocale,
         setCurrency,
+        addRecurringExpense,
+        updateRecurringExpense,
+        deleteRecurringExpense,
         t,
         tc,
         fc,
