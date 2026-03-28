@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import { formatCurrency } from '@/utils/currency';
-import { getWeekRange, getMonthRange, getWeekRanges } from '@/utils/dates';
+import { getWeekRange, getMonthRange, getWeekRanges, toISODate } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import SpendingChart from './SpendingChart';
 import { parseISO, isWithinInterval, format } from 'date-fns';
@@ -32,10 +32,16 @@ export default function Dashboard() {
     const remainingThisWeek = state.weeklyBudget - spentThisWeek;
     const totalSpent = state.expenses.reduce((sum, e) => sum + e.amount, 0);
 
-    // Calculate total saved/overspent all time
+    // Calculate total saved/overspent all time (only count expenses up to today)
+    const now = new Date();
     const weekRanges = getWeekRanges(state.firstUseDate);
     const totalBudgeted = weekRanges.length * state.weeklyBudget;
-    const totalSavedAllTime = totalBudgeted - totalSpent;
+    const totalSpentToDate = state.expenses
+      .filter((e) => {
+        try { return parseISO(e.date) <= now; } catch { return false; }
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+    const totalSavedAllTime = totalBudgeted - totalSpentToDate;
 
     // Category breakdown
     const categoryTotals: Record<string, number> = {};
@@ -64,10 +70,18 @@ export default function Dashboard() {
       };
     });
 
-    // Monthly category data for pie-like display
-    const monthlyCategoryTotals: Record<string, number> = {};
+    // Monthly category data for pie-like display, split into past/today vs future
+    const today = toISODate(now);
+    const monthlyCategoryTotals: Record<string, { current: number; future: number }> = {};
     monthExpenses.forEach((e) => {
-      monthlyCategoryTotals[e.category] = (monthlyCategoryTotals[e.category] || 0) + e.amount;
+      if (!monthlyCategoryTotals[e.category]) {
+        monthlyCategoryTotals[e.category] = { current: 0, future: 0 };
+      }
+      if (e.date > today) {
+        monthlyCategoryTotals[e.category].future += e.amount;
+      } else {
+        monthlyCategoryTotals[e.category].current += e.amount;
+      }
     });
 
     return {
@@ -221,22 +235,37 @@ export default function Dashboard() {
             <h3 className="text-md font-semibold text-white mb-4">{t('monthlySpending')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {Object.entries(stats.monthlyCategoryTotals)
-                .sort(([, a], [, b]) => b - a)
-                .map(([category, amount]) => (
-                  <div
-                    key={category}
-                    className="bg-slate-700/40 rounded-xl p-3 text-center border border-slate-600/20"
-                  >
+                .sort(([, a], [, b]) => (a.current + a.future) - (b.current + b.future))
+                .reverse()
+                .map(([category, { current, future }]) => {
+                  const isAllFuture = current === 0 && future > 0;
+                  return (
                     <div
-                      className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold"
-                      style={{ backgroundColor: getCategoryColor(category) }}
+                      key={category}
+                      className={`rounded-xl p-3 text-center border ${
+                        isAllFuture
+                          ? 'bg-slate-700/20 border-dashed border-slate-500/30 opacity-50'
+                          : 'bg-slate-700/40 border-slate-600/20'
+                      }`}
                     >
-                      {category[0]}
+                      <div
+                        className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold"
+                        style={{ backgroundColor: getCategoryColor(category) }}
+                      >
+                        {category[0]}
+                      </div>
+                      <p className="text-xs text-slate-400 truncate">{category}</p>
+                      {future > 0 && current > 0 ? (
+                        <div className="mt-1">
+                          <span className="text-sm font-bold text-amber-300">{formatCurrency(current)}</span>
+                          <span className="text-sm font-bold text-amber-300/40"> + {formatCurrency(future)}</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-bold text-amber-300 mt-1">{formatCurrency(current + future)}</p>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-400 truncate">{category}</p>
-                    <p className="text-sm font-bold text-amber-300 mt-1">{formatCurrency(amount)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               {Object.keys(stats.monthlyCategoryTotals).length === 0 && (
                 <p className="text-slate-500 text-sm col-span-full text-center py-4">{t('noExpenses')}</p>
               )}

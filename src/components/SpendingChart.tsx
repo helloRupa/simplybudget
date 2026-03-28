@@ -61,6 +61,7 @@ export default function SpendingChart({ data, t }: SpendingChartProps) {
             }}
             formatter={(value) => [`$${Number(value).toFixed(2)}`, '']}
             labelStyle={{ color: '#94a3b8' }}
+            cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
           />
           <Legend
             wrapperStyle={{ color: '#94a3b8', fontSize: 12 }}
