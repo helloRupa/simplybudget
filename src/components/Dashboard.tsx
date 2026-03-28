@@ -33,7 +33,10 @@ export default function Dashboard() {
 
     // Calculate total saved/overspent all time (only count expenses up to today)
     const now = new Date();
-    const weekRanges = getWeekRanges(state.firstUseDate);
+    const earliestExpenseDate = state.expenses.reduce((earliest, e) => {
+      return e.date < earliest ? e.date : earliest;
+    }, state.firstUseDate);
+    const weekRanges = getWeekRanges(earliestExpenseDate);
     const totalBudgeted = weekRanges.length * state.weeklyBudget;
     const totalSpentToDate = state.expenses
       .filter((e) => {

@@ -38,15 +38,25 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_INITIAL':
       return action.payload;
-    case 'ADD_EXPENSE':
-      return { ...state, expenses: [action.payload, ...state.expenses] };
-    case 'UPDATE_EXPENSE':
-      return {
+    case 'ADD_EXPENSE': {
+      const newState = { ...state, expenses: [action.payload, ...state.expenses] };
+      if (action.payload.date < state.firstUseDate) {
+        newState.firstUseDate = action.payload.date;
+      }
+      return newState;
+    }
+    case 'UPDATE_EXPENSE': {
+      const updatedState = {
         ...state,
         expenses: state.expenses.map((e) =>
           e.id === action.payload.id ? action.payload : e
         ),
       };
+      if (action.payload.date < state.firstUseDate) {
+        updatedState.firstUseDate = action.payload.date;
+      }
+      return updatedState;
+    }
     case 'DELETE_EXPENSE':
       return {
         ...state,
@@ -163,6 +173,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     setItem(STORAGE_KEYS.EXPENSES, state.expenses);
     setItem(STORAGE_KEYS.WEEKLY_BUDGET, state.weeklyBudget);
     setItem(STORAGE_KEYS.CATEGORIES, state.categories);
+    setItem(STORAGE_KEYS.FIRST_USE_DATE, state.firstUseDate);
     setItem(STORAGE_KEYS.LOCALE, state.locale);
     setItem(STORAGE_KEYS.CURRENCY, state.currency);
     setItem(STORAGE_KEYS.RECURRING_EXPENSES, state.recurringExpenses);
