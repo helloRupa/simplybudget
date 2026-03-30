@@ -93,6 +93,7 @@ const en = {
   budgetPositive: 'Budget must be greater than zero.',
 
   // General
+  and: 'and',
   of: 'of',
   total: 'Total',
   thisWeek: 'This Week',
@@ -145,6 +146,13 @@ const en = {
   november: 'November',
   december: 'December',
   totalSavedTooltip: 'Tracking since {startDate}. Total budgeted across {weeks} weeks ({budgeted}) minus total spent ({spent}).',
+
+  // About
+  about: 'About',
+  aboutDescription: 'A simple, privacy-first weekly budget tracker. All your data stays on your device — nothing is sent to any server.',
+  aboutBuiltBy: 'Built by',
+  aboutBuiltWith: 'Built with',
+  aboutVersion: 'Version',
 };
 
 const es: typeof en = {
@@ -219,6 +227,7 @@ const es: typeof en = {
   dateRequired: 'La fecha es requerida.',
   dateBeforeStart: 'La fecha no puede ser anterior a la fecha de inicio del presupuesto.',
   budgetPositive: 'El presupuesto debe ser mayor que cero.',
+  and: 'y',
   of: 'de',
   total: 'Total',
   thisWeek: 'Esta Semana',
@@ -269,6 +278,12 @@ const es: typeof en = {
   november: 'Noviembre',
   december: 'Diciembre',
   totalSavedTooltip: 'Seguimiento desde {startDate}. Total presupuestado en {weeks} semanas ({budgeted}) menos el total gastado ({spent}).',
+
+  about: 'Acerca de',
+  aboutDescription: 'Un rastreador de presupuesto semanal simple y privado. Todos tus datos permanecen en tu dispositivo — nada se envía a ningún servidor.',
+  aboutBuiltBy: 'Creado por',
+  aboutBuiltWith: 'Construido con',
+  aboutVersion: 'Versión',
 };
 
 const fr: typeof en = {
@@ -343,6 +358,7 @@ const fr: typeof en = {
   dateRequired: 'La date est requise.',
   dateBeforeStart: 'La date ne peut pas être antérieure à la date de début du budget.',
   budgetPositive: 'Le budget doit être supérieur à zéro.',
+  and: 'et',
   of: 'de',
   total: 'Total',
   thisWeek: 'Cette Semaine',
@@ -393,6 +409,12 @@ const fr: typeof en = {
   november: 'Novembre',
   december: 'Décembre',
   totalSavedTooltip: 'Suivi depuis {startDate}. Total budgété sur {weeks} semaines ({budgeted}) moins le total dépensé ({spent}).',
+
+  about: 'À propos',
+  aboutDescription: 'Un suivi de budget hebdomadaire simple et privé. Toutes vos données restent sur votre appareil — rien n\'est envoyé à aucun serveur.',
+  aboutBuiltBy: 'Créé par',
+  aboutBuiltWith: 'Construit avec',
+  aboutVersion: 'Version',
 };
 
 export const locales: Record<LocaleKey, typeof en> = { en, es, fr };
