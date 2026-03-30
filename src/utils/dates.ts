@@ -9,6 +9,7 @@ import {
   differenceInWeeks,
   addWeeks,
 } from 'date-fns';
+import { WeeklyBudget } from '@/types';
 
 export function getWeekRange(date: Date = new Date()) {
   const start = startOfWeek(date, { weekStartsOn: 1 }); // Monday
@@ -64,6 +65,24 @@ export function getTotalWeeksSinceStart(firstUseDate: string): number {
   } catch {
     return 1;
   }
+}
+
+export function getBudgetForWeek(weekStart: Date, budgetHistory: WeeklyBudget[]): number {
+  const weekStartStr = toISODate(weekStart);
+  let activeBudget = budgetHistory[0]?.amount ?? 0;
+  for (const entry of budgetHistory) {
+    if (entry.startDate <= weekStartStr) {
+      activeBudget = entry.amount;
+    } else {
+      break;
+    }
+  }
+  return activeBudget;
+}
+
+export function getTotalBudgeted(firstUseDate: string, budgetHistory: WeeklyBudget[]): number {
+  const weekRanges = getWeekRanges(firstUseDate);
+  return weekRanges.reduce((sum, week) => sum + getBudgetForWeek(week.start, budgetHistory), 0);
 }
 
 export function getWeekRanges(firstUseDate: string): Array<{ start: Date; end: Date }> {

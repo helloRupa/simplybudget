@@ -1,12 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
-import { Expense, RecurringExpense } from '@/types';
+import { Expense, RecurringExpense, WeeklyBudget } from '@/types';
 import { generatePendingExpenses } from '@/utils/recurring';
 import { DEFAULT_CATEGORIES, STORAGE_KEYS, CurrencyCode } from '@/utils/constants';
 import { formatCurrency, getCurrencySymbol } from '@/utils/currency';
 import { getItem, setItem } from '@/utils/storage';
-import { toISODate, formatDate } from '@/utils/dates';
+import { toISODate, formatDate, getWeekRange } from '@/utils/dates';
+import { parseISO } from 'date-fns';
 import { locales, LocaleKey, TranslationKey, categoryTranslations } from '@/i18n/locales';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,6 +19,7 @@ interface State {
   locale: LocaleKey;
   currency: CurrencyCode;
   recurringExpenses: RecurringExpense[];
+  budgetHistory: WeeklyBudget[];
 }
 
 type Action =
@@ -38,32 +40,30 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_INITIAL':
       return action.payload;
-    case 'ADD_EXPENSE': {
-      const newState = { ...state, expenses: [action.payload, ...state.expenses] };
-      if (action.payload.date < state.firstUseDate) {
-        newState.firstUseDate = action.payload.date;
-      }
-      return newState;
-    }
-    case 'UPDATE_EXPENSE': {
-      const updatedState = {
+    case 'ADD_EXPENSE':
+      return { ...state, expenses: [action.payload, ...state.expenses] };
+    case 'UPDATE_EXPENSE':
+      return {
         ...state,
         expenses: state.expenses.map((e) =>
           e.id === action.payload.id ? action.payload : e
         ),
       };
-      if (action.payload.date < state.firstUseDate) {
-        updatedState.firstUseDate = action.payload.date;
-      }
-      return updatedState;
-    }
     case 'DELETE_EXPENSE':
       return {
         ...state,
         expenses: state.expenses.filter((e) => e.id !== action.payload),
       };
-    case 'SET_WEEKLY_BUDGET':
-      return { ...state, weeklyBudget: action.payload };
+    case 'SET_WEEKLY_BUDGET': {
+      const weekStart = toISODate(getWeekRange().start);
+      const existing = state.budgetHistory.findIndex((b) => b.startDate === weekStart);
+      const newEntry: WeeklyBudget = { amount: action.payload, startDate: weekStart };
+      const updatedHistory =
+        existing >= 0
+          ? state.budgetHistory.map((b, i) => (i === existing ? newEntry : b))
+          : [...state.budgetHistory, newEntry].sort((a, b) => a.startDate.localeCompare(b.startDate));
+      return { ...state, weeklyBudget: action.payload, budgetHistory: updatedHistory };
+    }
     case 'ADD_CATEGORY':
       return { ...state, categories: [...state.categories, action.payload] };
     case 'DELETE_CATEGORY':
@@ -98,10 +98,11 @@ const initialState: State = {
   expenses: [],
   weeklyBudget: 200,
   categories: [...DEFAULT_CATEGORIES],
-  firstUseDate: toISODate(new Date()),
+  firstUseDate: toISODate(getWeekRange().start),
   locale: 'en',
   currency: 'USD',
   recurringExpenses: [],
+  budgetHistory: [],
 };
 
 interface BudgetContextValue {
@@ -134,19 +135,29 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const today = toISODate(new Date());
+    const weekStart = toISODate(getWeekRange().start);
+    const storedFirstUse = getItem<string>(STORAGE_KEYS.FIRST_USE_DATE, weekStart);
+    const firstUseDate = toISODate(getWeekRange(parseISO(storedFirstUse)).start);
     const loaded: State = {
       expenses: getItem<Expense[]>(STORAGE_KEYS.EXPENSES, []),
       weeklyBudget: getItem<number>(STORAGE_KEYS.WEEKLY_BUDGET, 200),
       categories: getItem<string[]>(STORAGE_KEYS.CATEGORIES, [...DEFAULT_CATEGORIES]),
-      firstUseDate: getItem<string>(STORAGE_KEYS.FIRST_USE_DATE, today),
+      firstUseDate,
       locale: getItem<LocaleKey>(STORAGE_KEYS.LOCALE, 'en'),
       currency: getItem<CurrencyCode>(STORAGE_KEYS.CURRENCY, 'USD'),
       recurringExpenses: getItem<RecurringExpense[]>(STORAGE_KEYS.RECURRING_EXPENSES, []),
+      budgetHistory: getItem<WeeklyBudget[]>(STORAGE_KEYS.BUDGET_HISTORY, []),
     };
-    // Set first use date if not set
+    // Migration: seed budget history for existing users
+    if (loaded.budgetHistory.length === 0) {
+      loaded.budgetHistory = [{ amount: loaded.weeklyBudget, startDate: loaded.firstUseDate }];
+      setItem(STORAGE_KEYS.BUDGET_HISTORY, loaded.budgetHistory);
+    }
+    // Set first use date if not set, and persist the week-aligned value
     if (!localStorage.getItem(STORAGE_KEYS.FIRST_USE_DATE)) {
-      setItem(STORAGE_KEYS.FIRST_USE_DATE, today);
+      setItem(STORAGE_KEYS.FIRST_USE_DATE, weekStart);
+    } else if (storedFirstUse !== firstUseDate) {
+      setItem(STORAGE_KEYS.FIRST_USE_DATE, firstUseDate);
     }
 
     // Generate any pending recurring expenses
@@ -177,6 +188,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     setItem(STORAGE_KEYS.LOCALE, state.locale);
     setItem(STORAGE_KEYS.CURRENCY, state.currency);
     setItem(STORAGE_KEYS.RECURRING_EXPENSES, state.recurringExpenses);
+    setItem(STORAGE_KEYS.BUDGET_HISTORY, state.budgetHistory);
   }, [state, isLoaded]);
 
   const addExpense = useCallback((expense: Omit<Expense, 'id' | 'createdAt'>) => {

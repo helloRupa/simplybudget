@@ -2,13 +2,13 @@
 
 import { useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { getWeekRange, getMonthRange, getWeekRanges, toISODate, formatShortDate } from '@/utils/dates';
+import { getWeekRange, getMonthRange, getWeekRanges, toISODate, formatShortDate, getTotalBudgeted } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import SpendingChart from './SpendingChart';
 import { parseISO, isWithinInterval } from 'date-fns';
 
 export default function Dashboard() {
-  const { state, t, tc, fc, currencySymbol, intlLocale } = useBudget();
+  const { state, t, tc, fc, fd, currencySymbol, intlLocale } = useBudget();
 
   const stats = useMemo(() => {
     const { start: weekStart, end: weekEnd } = getWeekRange();
@@ -33,14 +33,11 @@ export default function Dashboard() {
 
     // Calculate total saved/overspent all time (only count expenses up to today)
     const now = new Date();
-    const earliestExpenseDate = state.expenses.reduce((earliest, e) => {
-      return e.date < earliest ? e.date : earliest;
-    }, state.firstUseDate);
-    const weekRanges = getWeekRanges(earliestExpenseDate);
-    const totalBudgeted = weekRanges.length * state.weeklyBudget;
+    const weekRanges = getWeekRanges(state.firstUseDate);
+    const totalBudgeted = getTotalBudgeted(state.firstUseDate, state.budgetHistory);
     const totalSpentToDate = state.expenses
       .filter((e) => {
-        try { return parseISO(e.date) <= now; } catch { return false; }
+        try { return e.date >= state.firstUseDate && parseISO(e.date) <= now; } catch { return false; }
       })
       .reduce((sum, e) => sum + e.amount, 0);
     const totalSavedAllTime = totalBudgeted - totalSpentToDate;
@@ -91,6 +88,9 @@ export default function Dashboard() {
       spentThisMonth,
       remainingThisWeek,
       totalSavedAllTime,
+      totalBudgeted,
+      totalSpentToDate,
+      numWeeks: weekRanges.length,
       topCategories,
       weeklyChartData,
       monthlyCategoryTotals,
@@ -152,6 +152,12 @@ export default function Dashboard() {
           title={stats.totalSavedAllTime >= 0 ? t('totalSavedAllTime') : t('totalOverspentAllTime')}
           value={fc(Math.abs(stats.totalSavedAllTime))}
           subtitle={stats.totalSavedAllTime >= 0 ? t('allTime') : t('allTime')}
+          tooltip={t('totalSavedTooltip')
+            .replace('{startDate}', fd(state.firstUseDate))
+            .replace('{weeks}', String(stats.numWeeks))
+            .replace('{budgeted}', fc(stats.totalBudgeted))
+            .replace('{spent}', fc(stats.totalSpentToDate))
+          }
           icon={
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" />
@@ -285,9 +291,10 @@ interface SummaryCardProps {
   subtitle: string;
   icon: React.ReactNode;
   color: 'teal' | 'green' | 'red' | 'amber';
+  tooltip?: string;
 }
 
-function SummaryCard({ title, value, subtitle, icon, color }: SummaryCardProps) {
+function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCardProps) {
   const colorStyles = {
     teal: 'from-teal-600/20 to-teal-800/20 border-teal-400/30',
     green: 'from-green-600/20 to-green-800/20 border-green-500/30',
@@ -316,6 +323,16 @@ function SummaryCard({ title, value, subtitle, icon, color }: SummaryCardProps) 
           <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
           <p className={`text-2xl font-bold mt-1 ${valueColors[color]}`}>{value}</p>
           <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
+          {tooltip && (
+            <div className="relative group/tip inline-block mt-1">
+              <svg className="w-4 h-4 text-slate-500 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="absolute bottom-full left-0 mb-2 hidden group-hover/tip:block w-56 p-2 text-xs text-slate-200 bg-slate-900 border border-slate-600 rounded-lg shadow-xl z-10">
+                {tooltip}
+              </div>
+            </div>
+          )}
         </div>
         <div className={`${iconColors[color]} opacity-60`}>{icon}</div>
       </div>

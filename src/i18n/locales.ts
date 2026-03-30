@@ -112,6 +112,7 @@ const en = {
   recurring: 'Recurring',
   monthly: 'monthly',
   onDay: 'on day',
+  totalSavedTooltip: 'Tracking since {startDate}. Total budgeted across {weeks} weeks ({budgeted}) minus total spent ({spent}).',
 };
 
 const es: typeof en = {
@@ -203,6 +204,7 @@ const es: typeof en = {
   recurring: 'Recurrente',
   monthly: 'mensual',
   onDay: 'el día',
+  totalSavedTooltip: 'Seguimiento desde {startDate}. Total presupuestado en {weeks} semanas ({budgeted}) menos el total gastado ({spent}).',
 };
 
 const fr: typeof en = {
@@ -294,6 +296,7 @@ const fr: typeof en = {
   recurring: 'Récurrent',
   monthly: 'mensuel',
   onDay: 'le jour',
+  totalSavedTooltip: 'Suivi depuis {startDate}. Total budgété sur {weeks} semaines ({budgeted}) moins le total dépensé ({spent}).',
 };
 
 export const locales: Record<LocaleKey, typeof en> = { en, es, fr };
