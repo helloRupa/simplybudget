@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { RecurringExpense } from '@/types';
+import { RecurringExpense, RecurringFrequency } from '@/types';
 import { toISODate } from '@/utils/dates';
+import { TranslationKey } from '@/i18n/locales';
 
 interface Props {
   onToast: (message: string, type: 'success' | 'error') => void;
 }
+
+const DAY_KEYS: TranslationKey[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const MONTH_KEYS: TranslationKey[] = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
 export default function RecurringExpenseManager({ onToast }: Props) {
   const { state, addRecurringExpense, updateRecurringExpense, deleteRecurringExpense, t, tc, fc, currencySymbol } = useBudget();
@@ -19,7 +23,10 @@ export default function RecurringExpenseManager({ onToast }: Props) {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [frequency, setFrequency] = useState<RecurringFrequency>('monthly');
   const [dayOfMonth, setDayOfMonth] = useState('1');
+  const [dayOfWeek, setDayOfWeek] = useState('1'); // Monday
+  const [monthOfYear, setMonthOfYear] = useState('0'); // January
   const [startDate, setStartDate] = useState(toISODate(new Date()));
   const [endDate, setEndDate] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -28,7 +35,10 @@ export default function RecurringExpenseManager({ onToast }: Props) {
     setAmount('');
     setCategory('');
     setDescription('');
+    setFrequency('monthly');
     setDayOfMonth('1');
+    setDayOfWeek('1');
+    setMonthOfYear('0');
     setStartDate(toISODate(new Date()));
     setEndDate('');
     setErrors({});
@@ -40,7 +50,10 @@ export default function RecurringExpenseManager({ onToast }: Props) {
     setAmount(re.amount.toString());
     setCategory(re.category);
     setDescription(re.description);
+    setFrequency(re.frequency || 'monthly');
     setDayOfMonth(re.dayOfMonth.toString());
+    setDayOfWeek((re.dayOfWeek ?? 1).toString());
+    setMonthOfYear((re.monthOfYear ?? 0).toString());
     setStartDate(re.startDate);
     setEndDate(re.endDate ?? '');
     setEditingId(re.id);
@@ -68,7 +81,10 @@ export default function RecurringExpenseManager({ onToast }: Props) {
       amount: Math.round(parsedAmount * 100) / 100,
       category,
       description,
+      frequency,
       dayOfMonth: parseInt(dayOfMonth),
+      dayOfWeek: parseInt(dayOfWeek),
+      monthOfYear: parseInt(monthOfYear),
       startDate,
       endDate: endDate || null,
     };
@@ -89,6 +105,19 @@ export default function RecurringExpenseManager({ onToast }: Props) {
   function handleDelete(id: string) {
     deleteRecurringExpense(id);
     onToast(t('recurringExpenseDeleted'), 'success');
+  }
+
+  function frequencyLabel(re: RecurringExpense): string {
+    const freq = re.frequency || 'monthly';
+    switch (freq) {
+      case 'weekly':
+        return `${t('weekly')}, ${t('everyWeek')} ${t(DAY_KEYS[re.dayOfWeek ?? 0])}`;
+      case 'annually':
+        return `${t('annually')}, ${t(MONTH_KEYS[re.monthOfYear ?? 0])} ${re.dayOfMonth}`;
+      case 'monthly':
+      default:
+        return `${t('monthly')}, ${t('onDay')} ${re.dayOfMonth}`;
+    }
   }
 
   return (
@@ -160,19 +189,81 @@ export default function RecurringExpenseManager({ onToast }: Props) {
               />
             </div>
 
-            {/* Day of Month */}
+            {/* Frequency */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">{t('dayOfMonth')}</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">{t('frequency')}</label>
               <select
-                value={dayOfMonth}
-                onChange={(e) => setDayOfMonth(e.target.value)}
+                value={frequency}
+                onChange={(e) => setFrequency(e.target.value as RecurringFrequency)}
                 className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
               >
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
+                <option value="weekly">{t('weekly')}</option>
+                <option value="monthly">{t('monthly')}</option>
+                <option value="annually">{t('annually')}</option>
               </select>
             </div>
+
+            {/* Day of Week (weekly) */}
+            {frequency === 'weekly' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">{t('dayOfWeek')}</label>
+                <select
+                  value={dayOfWeek}
+                  onChange={(e) => setDayOfWeek(e.target.value)}
+                  className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                >
+                  {DAY_KEYS.map((key, i) => (
+                    <option key={i} value={i}>{t(key)}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Day of Month (monthly) */}
+            {frequency === 'monthly' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">{t('dayOfMonth')}</label>
+                <select
+                  value={dayOfMonth}
+                  onChange={(e) => setDayOfMonth(e.target.value)}
+                  className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                >
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Month + Day (annually) */}
+            {frequency === 'annually' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">{t('monthOfYear')}</label>
+                  <select
+                    value={monthOfYear}
+                    onChange={(e) => setMonthOfYear(e.target.value)}
+                    className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  >
+                    {MONTH_KEYS.map((key, i) => (
+                      <option key={i} value={i}>{t(key)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">{t('dayOfMonth')}</label>
+                  <select
+                    value={dayOfMonth}
+                    onChange={(e) => setDayOfMonth(e.target.value)}
+                    className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  >
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
 
             {/* Start Date */}
             <div>
@@ -233,7 +324,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-semibold text-amber-300">{fc(re.amount)}</span>
                   <span className="text-xs text-slate-400">
-                    {t('monthly')}, {t('onDay')} {re.dayOfMonth}
+                    {frequencyLabel(re)}
                   </span>
                 </div>
                 <p className="text-sm text-slate-200 truncate">

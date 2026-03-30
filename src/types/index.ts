@@ -8,14 +8,19 @@ export interface Expense {
   recurringExpenseId?: string; // links to RecurringExpense that generated this
 }
 
+export type RecurringFrequency = 'weekly' | 'monthly' | 'annually';
+
 export interface RecurringExpense {
   id: string;
   amount: number;
   category: string;
   description: string;
-  dayOfMonth: number; // 1-31
+  frequency: RecurringFrequency; // defaults to 'monthly' for legacy data
+  dayOfMonth: number; // 1-31 (used for monthly/annually)
+  dayOfWeek?: number; // 0=Sunday..6=Saturday (used for weekly)
+  monthOfYear?: number; // 0=Jan..11=Dec (used for annually)
   createdAt: string; // ISO datetime
-  startDate: string; // ISO date YYYY-MM-DD — first month this applies
+  startDate: string; // ISO date YYYY-MM-DD — first occurrence this applies
   endDate: string | null; // ISO date or null (indefinite)
   lastGeneratedDate: string | null; // ISO date of most recent generated expense
 }
