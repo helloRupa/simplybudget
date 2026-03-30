@@ -3,12 +3,12 @@
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   ReferenceLine,
 } from 'recharts';
 import { TranslationKey } from '@/i18n/locales';
@@ -24,6 +24,14 @@ interface SpendingChartProps {
   t: (key: TranslationKey) => string;
   fc: (amount: number) => string;
   currencySymbol: string;
+}
+
+function getBarColor(spent: number, budget: number): string {
+  if (budget <= 0) return '#14b8a6'; // teal-500
+  const pct = (spent / budget) * 100;
+  if (pct > 90) return '#ef4444'; // red-500
+  if (pct > 70) return '#f59e0b'; // amber-500
+  return '#14b8a6'; // teal-500
 }
 
 export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingChartProps) {
@@ -66,10 +74,8 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
               '',
             ]}
             labelStyle={{ color: '#94a3b8' }}
+            itemStyle={{ color: '#fff' }}
             cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
-          />
-          <Legend
-            wrapperStyle={{ color: '#94a3b8', fontSize: 12 }}
           />
           <ReferenceLine
             y={budgetAmount}
@@ -85,10 +91,13 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
           <Bar
             dataKey="spent"
             name={t('spent')}
-            fill="#8b5cf6"
             radius={[6, 6, 0, 0]}
             maxBarSize={50}
-          />
+          >
+            {data.map((entry, index) => (
+              <Cell key={index} fill={getBarColor(entry.spent, entry.budget)} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
