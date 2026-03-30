@@ -180,10 +180,10 @@ export default function Dashboard() {
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               budgetPercentage > 90
-                ? 'bg-red-500'
+                ? 'bg-gradient-to-r from-orange-400 via-red-500 to-rose-700'
                 : budgetPercentage > 70
-                ? 'bg-amber-500'
-                : 'bg-teal-400'
+                  ? 'bg-gradient-to-r from-amber-300 via-amber-500 to-orange-600'
+                  : 'bg-gradient-to-r from-teal-300 via-teal-500 to-blue-600'
             }`}
             style={{ width: `${Math.min(100, budgetPercentage)}%` }}
           />
