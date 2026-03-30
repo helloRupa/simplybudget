@@ -169,11 +169,11 @@ export default function Dashboard() {
       </div>
 
       {/* Budget Progress Bar */}
-      <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
+      <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-slate-300">{t('weeklyBudget')}</span>
-          <span className="text-sm text-amber-300 font-semibold">
-            {fc(stats.spentThisWeek)} / {fc(stats.weeklyBudget)}
+          <span className="text-sm font-medium text-slate-300 uppercase tracking-wide">{t('weeklyBudget')}</span>
+          <span className="text-sm text-white font-semibold">
+            {fc(stats.spentThisWeek)} <span className="text-slate-500">/ {fc(stats.weeklyBudget)}</span>
           </span>
         </div>
         <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
@@ -191,45 +191,50 @@ export default function Dashboard() {
       </div>
 
       {state.expenses.length === 0 ? (
-        <div className="bg-slate-800/30 rounded-2xl border border-slate-600/20 p-12 text-center">
+        <div className="bg-slate-800/50 rounded-2xl border border-slate-600/20 p-12 text-center">
           <p className="text-slate-400 text-lg">{t('noExpensesYet')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Spending Over Time Chart */}
-          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-5">
             <h3 className="text-md font-semibold text-white mb-4">{t('budgetVsSpending')}</h3>
             <SpendingChart data={stats.weeklyChartData} t={t} fc={fc} currencySymbol={currencySymbol} />
           </div>
 
           {/* Top Categories */}
-          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5">
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-5">
             <h3 className="text-md font-semibold text-white mb-4">{t('topCategories')}</h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {stats.topCategories.map(([category, amount]) => {
                 const percentage = stats.totalSpent > 0 ? (amount / stats.totalSpent) * 100 : 0;
+                const catColor = getCategoryColor(category);
                 return (
                   <div key={category}>
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: getCategoryColor(category) }}
-                        />
-                        <span className="text-sm text-slate-200">{tc(category)}</span>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                          style={{ backgroundColor: `${catColor}30`, color: catColor }}
+                        >
+                          {tc(category)[0]}
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-slate-200">{tc(category)}</span>
+                          <p className="text-xs text-slate-500">{percentage.toFixed(1)}% {t('of')} {t('total').toLowerCase()}</p>
+                        </div>
                       </div>
-                      <span className="text-sm font-semibold text-amber-300">{fc(amount)}</span>
+                      <span className="text-sm font-semibold text-white">{fc(amount)}</span>
                     </div>
-                    <div className="w-full bg-slate-700/50 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
                           width: `${percentage}%`,
-                          backgroundColor: getCategoryColor(category),
+                          backgroundColor: catColor,
                         }}
                       />
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">{percentage.toFixed(1)}%</p>
                   </div>
                 );
               })}
@@ -240,7 +245,7 @@ export default function Dashboard() {
           </div>
 
           {/* Monthly Spending by Category */}
-          <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-5 lg:col-span-2">
+          <div className="bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-5 lg:col-span-2">
             <h3 className="text-md font-semibold text-white mb-4">{t('monthlySpending')}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {Object.entries(stats.monthlyCategoryTotals)
@@ -248,29 +253,30 @@ export default function Dashboard() {
                 .reverse()
                 .map(([category, { current, future }]) => {
                   const isAllFuture = current === 0 && future > 0;
+                  const catColor = getCategoryColor(category);
                   return (
                     <div
                       key={category}
-                      className={`rounded-xl p-3 text-center border ${
+                      className={`rounded-xl p-4 text-center border ${
                         isAllFuture
-                          ? 'bg-slate-700/20 border-dashed border-slate-500/30 opacity-50'
-                          : 'bg-slate-700/40 border-slate-600/20'
+                          ? 'bg-slate-800/40 border-dashed border-slate-600/30 opacity-50'
+                          : 'bg-slate-800/60 border-slate-600/20'
                       }`}
                     >
                       <div
-                        className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold"
-                        style={{ backgroundColor: getCategoryColor(category) }}
+                        className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center text-sm font-bold"
+                        style={{ backgroundColor: `${catColor}25`, color: catColor, border: `1.5px solid ${catColor}40` }}
                       >
                         {tc(category)[0]}
                       </div>
-                      <p className="text-xs text-slate-400 truncate">{tc(category)}</p>
+                      <p className="text-xs text-slate-400 uppercase tracking-wide truncate">{tc(category)}</p>
                       {future > 0 && current > 0 ? (
                         <div className="mt-1">
-                          <span className="text-sm font-bold text-amber-300">{fc(current)}</span>
-                          <span className="text-sm font-bold text-amber-300/40"> + {fc(future)}</span>
+                          <span className="text-sm font-bold text-white">{fc(current)}</span>
+                          <span className="text-sm font-bold text-slate-500"> + {fc(future)}</span>
                         </div>
                       ) : (
-                        <p className="text-sm font-bold text-amber-300 mt-1">{fc(current + future)}</p>
+                        <p className="text-sm font-bold text-white mt-1">{fc(current + future)}</p>
                       )}
                     </div>
                   );
@@ -313,24 +319,24 @@ function StyledAmount({ value, colorClass, centsColorClass }: { value: string; c
 
 function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCardProps) {
   const colorStyles = {
-    teal: 'from-teal-600/20 to-teal-800/20 border-teal-400/30',
-    green: 'from-green-600/20 to-green-800/20 border-green-500/30',
-    red: 'from-red-600/20 to-red-800/20 border-red-500/30',
-    amber: 'from-amber-600/20 to-amber-800/20 border-amber-500/30',
+    teal: 'border-teal-500/20 hover:border-teal-400/40',
+    green: 'border-green-500/20 hover:border-green-400/40',
+    red: 'border-red-500/20 hover:border-red-400/40',
+    amber: 'border-amber-500/20 hover:border-amber-400/40',
   };
 
-  const iconColors = {
-    teal: 'text-teal-300',
-    green: 'text-green-400',
-    red: 'text-red-400',
-    amber: 'text-amber-400',
+  const iconBgColors = {
+    teal: 'bg-teal-500/20 text-teal-300',
+    green: 'bg-green-500/20 text-green-400',
+    red: 'bg-red-500/20 text-red-400',
+    amber: 'bg-amber-500/20 text-amber-400',
   };
 
   const valueColors = {
-    teal: 'text-teal-300',
-    green: 'text-green-400',
-    red: 'text-red-400',
-    amber: 'text-amber-300',
+    teal: 'text-teal-200',
+    green: 'text-green-300',
+    red: 'text-red-300',
+    amber: 'text-amber-200',
   };
 
   const centsColors = {
@@ -341,11 +347,11 @@ function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCa
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colorStyles[color]} backdrop-blur-sm rounded-2xl border p-5`}>
+    <div className={`bg-slate-800/80 backdrop-blur-sm rounded-2xl border ${colorStyles[color]} p-5 transition-colors`}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
-          <p className="mt-1"><StyledAmount value={value} colorClass={valueColors[color]} centsColorClass={centsColors[color]} /></p>
+          <p className="mt-2"><StyledAmount value={value} colorClass={valueColors[color]} centsColorClass={centsColors[color]} /></p>
           <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
           {tooltip && (
             <div className="relative group/tip inline-block mt-1">
@@ -358,7 +364,7 @@ function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCa
             </div>
           )}
         </div>
-        <div className={`${iconColors[color]} opacity-60`}>{icon}</div>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBgColors[color]}`}>{icon}</div>
       </div>
     </div>
   );

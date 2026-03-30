@@ -41,7 +41,7 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
           <XAxis
             dataKey="week"
             tick={{ fill: '#94a3b8', fontSize: 12 }}
