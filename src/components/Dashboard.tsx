@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useBudget } from '@/context/BudgetContext';
-import { getWeekRange, getMonthRange, getWeekRanges, toISODate, formatShortDate, getTotalBudgeted } from '@/utils/dates';
+import { getWeekRange, getMonthRange, getWeekRanges, toISODate, formatShortDate, getTotalBudgeted, getBudgetForWeek } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
 import SpendingChart from './SpendingChart';
 import { parseISO, isWithinInterval } from 'date-fns';
@@ -65,7 +65,7 @@ export default function Dashboard() {
       return {
         week: formatShortDate(range.start, intlLocale),
         spent: weekExpenseTotal,
-        budget: state.weeklyBudget,
+        budget: getBudgetForWeek(range.start, state.budgetHistory),
       };
     });
 

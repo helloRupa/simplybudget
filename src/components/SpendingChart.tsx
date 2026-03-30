@@ -61,7 +61,10 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
               borderRadius: '12px',
               color: '#fff',
             }}
-            formatter={(value) => [fc(Number(value)), '']}
+            formatter={(value, _name, props) => [
+              `${fc(Number(value))} / ${fc((props.payload as ChartData).budget)}`,
+              '',
+            ]}
             labelStyle={{ color: '#94a3b8' }}
             cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
           />
