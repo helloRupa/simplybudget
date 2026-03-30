@@ -26,18 +26,43 @@ Financial data should never be silently deleted. An archive model is safer:
 - Archive older data into a downloadable backup, then remove from active storage
 - Let the user control when archival happens
 
+### Preserving All-Time Calculations
+
+The dashboard computes all-time saved/overspent as `totalBudgeted - totalSpentToDate`, where `totalSpentToDate` sums every expense in state. Category breakdowns also iterate the full expense array. If archived expenses are simply removed, these calculations lose historical data and become inaccurate (spending appears lower than reality, savings appear inflated).
+
+To fix this, store a running summary when archiving:
+
+```ts
+archivedSummary: {
+  totalSpent: number;                      // sum of all archived expense amounts
+  categoryTotals: Record<string, number>;  // per-category sums of archived expenses
+  archivedBefore: string;                  // date cutoff
+}
+```
+
+Dashboard calculations then merge archived and active data:
+
+- `totalSpentToDate = archivedSummary.totalSpent + sum(active expenses)`
+- `categoryTotals = merge(archivedSummary.categoryTotals, active category totals)`
+
+The budget side (`getTotalBudgeted`) derives from `firstUseDate` + `budgetHistory`, neither of which is archived, so it needs no changes.
+
+If the user archives multiple times, each archive operation should update the single `archivedSummary` by adding to the existing totals and advancing the `archivedBefore` date.
+
 ### localStorage Changes
 
-- Add an `archivedBefore` date field to BudgetState
-- Active data = expenses with dates after `archivedBefore`
-- Dashboard and charts already filter by date ranges, so they'd naturally scope to active data
+- Add `archivedSummary` (as above) to BudgetState
+- Active data = expenses with dates after `archivedSummary.archivedBefore`
+- Dashboard and charts merge archived summary with active data for all-time views
+- Week/month scoped views (current week, current month) are unaffected since they already filter by date range
 
 ### Export/Import Considerations
 
 - The existing JSON backup (`backup.ts`) exports full state — after archival it would contain only active data, which is correct
 - Add a separate "archive export" that saves old data before removing it
 - Import (`parseBackup`) replaces state entirely, so importing an old archive restores that period's data without changes to the parser
-- Consider bumping the backup format `version` if the `archivedBefore` field is added, with backward-compatible parsing
+- Backup must include `archivedSummary` so that imported data retains accurate all-time totals
+- Consider bumping the backup format `version` if `archivedSummary` is added, with backward-compatible parsing
 
 ### User Flow
 
