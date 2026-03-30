@@ -97,7 +97,7 @@ export default function Dashboard() {
       totalSpent,
       weeklyBudget: state.weeklyBudget,
     };
-  }, [state]);
+  }, [state, intlLocale]);
 
   const budgetPercentage = Math.min(100, (stats.spentThisWeek / stats.weeklyBudget) * 100);
 
