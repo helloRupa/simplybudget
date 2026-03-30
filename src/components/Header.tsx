@@ -2,6 +2,7 @@
 
 import { useBudget } from '@/context/BudgetContext';
 import { LOCALE_NAMES, LocaleKey } from '@/i18n/locales';
+import moneyFrog from '../assets/images/moneyFrog.svg'
 
 interface HeaderProps {
   activeTab: 'dashboard' | 'expenses' | 'settings';
@@ -22,10 +23,11 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-teal-400 rounded-lg flex items-center justify-center">
-              <span className="text-slate-900 font-bold text-lg">$</span>
-            </div>
-            <h1 className="text-xl font-bold text-white">{t('appName')}</h1>
+            <img src={moneyFrog.src} alt="Money Frog" className="w-12 h-12" style={{backgroundColor: '#fff', padding: '4px', borderRadius: '16px', border: '2px solid #2db2a2'}} />
+            <h1 className="text-2xl font-extrabold tracking-tight">
+              <span className="text-white">Simply</span>
+              <span className="text-teal-400">Budget</span>
+            </h1>
           </div>
 
           <nav className="hidden sm:flex items-center gap-1">
