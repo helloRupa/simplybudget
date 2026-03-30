@@ -37,7 +37,11 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
       newErrors.amount = t('amountPositive');
     }
     if (!category) newErrors.category = t('categoryRequired');
-    if (!date) newErrors.date = t('dateRequired');
+    if (!date) {
+      newErrors.date = t('dateRequired');
+    } else if (date < state.firstUseDate) {
+      newErrors.date = t('dateBeforeStart');
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -81,7 +85,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
       <h2 className="text-lg font-semibold text-white mb-4">
         {editingExpense ? t('editExpense') : t('addExpense')}
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Amount */}
           <div>
@@ -129,6 +133,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
             <input
               type="date"
               value={date}
+              min={state.firstUseDate}
               onChange={(e) => setDate(e.target.value)}
               className={`w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border ${
                 errors.date ? 'border-red-400' : 'border-slate-500/50'

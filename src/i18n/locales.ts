@@ -89,6 +89,7 @@ const en = {
   amountPositive: 'Amount must be greater than zero.',
   categoryRequired: 'Please select a category.',
   dateRequired: 'Date is required.',
+  dateBeforeStart: 'Date cannot be before budget start date.',
   budgetPositive: 'Budget must be greater than zero.',
 
   // General
@@ -216,6 +217,7 @@ const es: typeof en = {
   amountPositive: 'El monto debe ser mayor que cero.',
   categoryRequired: 'Por favor selecciona una categoría.',
   dateRequired: 'La fecha es requerida.',
+  dateBeforeStart: 'La fecha no puede ser anterior a la fecha de inicio del presupuesto.',
   budgetPositive: 'El presupuesto debe ser mayor que cero.',
   of: 'de',
   total: 'Total',
@@ -339,6 +341,7 @@ const fr: typeof en = {
   amountPositive: 'Le montant doit être supérieur à zéro.',
   categoryRequired: 'Veuillez sélectionner une catégorie.',
   dateRequired: 'La date est requise.',
+  dateBeforeStart: 'La date ne peut pas être antérieure à la date de début du budget.',
   budgetPositive: 'Le budget doit être supérieur à zéro.',
   of: 'de',
   total: 'Total',
