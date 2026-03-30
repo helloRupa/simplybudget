@@ -115,6 +115,7 @@ interface BudgetContextValue {
   deleteCategory: (name: string) => void;
   setLocale: (locale: LocaleKey) => void;
   setCurrency: (currency: CurrencyCode) => void;
+  importData: (data: State) => void;
   addRecurringExpense: (expense: Omit<RecurringExpense, 'id' | 'createdAt' | 'lastGeneratedDate'>) => void;
   updateRecurringExpense: (expense: RecurringExpense) => void;
   deleteRecurringExpense: (id: string) => void;
@@ -263,6 +264,10 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'DELETE_RECURRING_EXPENSE', payload: id });
   }, []);
 
+  const importData = useCallback((data: State) => {
+    dispatch({ type: 'SET_INITIAL', payload: data });
+  }, []);
+
   const t = useCallback(
     (key: TranslationKey): string => {
       return locales[state.locale]?.[key] ?? locales.en[key] ?? key;
@@ -308,6 +313,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         deleteCategory,
         setLocale,
         setCurrency,
+        importData,
         addRecurringExpense,
         updateRecurringExpense,
         deleteRecurringExpense,
