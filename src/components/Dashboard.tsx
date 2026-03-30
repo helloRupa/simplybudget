@@ -294,6 +294,22 @@ interface SummaryCardProps {
   tooltip?: string;
 }
 
+function StyledAmount({ value, colorClass, centsColorClass }: { value: string; colorClass: string; centsColorClass: string }) {
+  // Split formatted currency into symbol, whole number, and decimal parts
+  // e.g. "$1,234.56" -> ["$", "1,234", ".56"]
+  const match = value.match(/^([^\d]*)([\d,]+)(\.\d+)?(.*)$/);
+  if (!match) return <span className={colorClass}>{value}</span>;
+  const [, prefix, whole, decimal, suffix] = match;
+  return (
+    <span className="inline-flex items-baseline">
+      {prefix && <span className={`text-2xl font-bold ${colorClass}`}>{prefix}</span>}
+      <span className={`text-2xl font-bold ${colorClass}`}>{whole}</span>
+      {decimal && <span className={`text-base font-semibold ${centsColorClass}`}>{decimal}</span>}
+      {suffix && <span className={`text-2xl font-bold ${colorClass}`}>{suffix}</span>}
+    </span>
+  );
+}
+
 function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCardProps) {
   const colorStyles = {
     teal: 'from-teal-600/20 to-teal-800/20 border-teal-400/30',
@@ -316,12 +332,19 @@ function SummaryCard({ title, value, subtitle, icon, color, tooltip }: SummaryCa
     amber: 'text-amber-300',
   };
 
+  const centsColors = {
+    teal: 'text-teal-500',
+    green: 'text-green-600',
+    red: 'text-red-600',
+    amber: 'text-amber-500',
+  };
+
   return (
     <div className={`bg-gradient-to-br ${colorStyles[color]} backdrop-blur-sm rounded-2xl border p-5`}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">{title}</p>
-          <p className={`text-2xl font-bold mt-1 ${valueColors[color]}`}>{value}</p>
+          <p className="mt-1"><StyledAmount value={value} colorClass={valueColors[color]} centsColorClass={centsColors[color]} /></p>
           <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
           {tooltip && (
             <div className="relative group/tip inline-block mt-1">
