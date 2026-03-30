@@ -30,7 +30,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
             </h1>
           </div>
 
-          <nav className="hidden sm:flex items-center gap-1">
+          <nav className="hidden min-[800px]:flex items-center gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -61,7 +61,7 @@ export default function Header({ activeTab, onTabChange }: HeaderProps) {
         </div>
 
         {/* Mobile nav */}
-        <nav className="flex sm:hidden pb-3 gap-1">
+        <nav className="flex min-[800px]:hidden pb-3 gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
