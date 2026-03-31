@@ -26,6 +26,7 @@ function AppContent() {
   const handleEdit = useCallback((expense: Expense) => {
     setEditingExpense(expense);
     setActiveTab('expenses');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const handleFormDone = useCallback(() => {

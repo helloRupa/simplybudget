@@ -159,7 +159,14 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
           {editingExpense && (
             <button
               type="button"
-              onClick={onDone}
+              onClick={() => {
+                setAmount('');
+                setCategory('');
+                setDescription('');
+                setDate(toISODate(new Date()));
+                setErrors({});
+                onDone();
+              }}
               className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-600/30 hover:bg-slate-600/50 transition-colors"
             >
               {t('cancel')}
