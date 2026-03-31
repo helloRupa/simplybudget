@@ -3,7 +3,6 @@
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,6 +10,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts';
+import type { BarShapeProps } from 'recharts';
 import { TranslationKey } from '@/i18n/locales';
 
 interface ChartData {
@@ -93,11 +93,19 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
             name={t('spent')}
             radius={[6, 6, 0, 0]}
             maxBarSize={50}
-          >
-            {data.map((entry, index) => (
-              <Cell key={index} fill={getBarColor(entry.spent, entry.budget)} />
-            ))}
-          </Bar>
+            shape={(props: BarShapeProps) => {
+              const payload = props.payload as unknown as ChartData;
+              const fill = getBarColor(payload.spent, payload.budget);
+              const { x = 0, y = 0, width = 0, height = 0 } = props;
+              const r = 6;
+              return (
+                <path
+                  d={`M${x},${y + r} Q${x},${y} ${x + r},${y} L${x + width - r},${y} Q${x + width},${y} ${x + width},${y + r} L${x + width},${y + height} L${x},${y + height} Z`}
+                  fill={fill}
+                />
+              );
+            }}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
