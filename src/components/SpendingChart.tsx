@@ -8,7 +8,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from 'recharts';
 import type { BarShapeProps } from 'recharts';
 import { TranslationKey } from '@/i18n/locales';
@@ -26,12 +25,12 @@ interface SpendingChartProps {
   currencySymbol: string;
 }
 
-function getBarColor(spent: number, budget: number): string {
-  if (budget <= 0) return '#14b8a6'; // teal-500
+function getBarFill(spent: number, budget: number): string {
+  if (budget <= 0) return 'url(#barTeal)';
   const pct = (spent / budget) * 100;
-  if (pct > 90) return '#ef4444'; // red-500
-  if (pct > 70) return '#f59e0b'; // amber-500
-  return '#14b8a6'; // teal-500
+  if (pct > 90) return 'url(#barRed)';
+  if (pct > 70) return 'url(#barAmber)';
+  return 'url(#barTeal)';
 }
 
 export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingChartProps) {
@@ -43,12 +42,24 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
     );
   }
 
-  const budgetAmount = data[0]?.budget || 0;
-
   return (
     <div className="h-64">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <defs>
+            <linearGradient id="barTeal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#5eead4" />
+              <stop offset="100%" stopColor="#2563eb" />
+            </linearGradient>
+            <linearGradient id="barAmber" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fcd34d" />
+              <stop offset="100%" stopColor="#ea580c" />
+            </linearGradient>
+            <linearGradient id="barRed" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fe7a5b" />
+              <stop offset="100%" stopColor="#be123c" />
+            </linearGradient>
+          </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
           <XAxis
             dataKey="week"
@@ -77,17 +88,6 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
             itemStyle={{ color: '#fff' }}
             cursor={{ fill: 'rgba(139, 92, 246, 0.1)' }}
           />
-          <ReferenceLine
-            y={budgetAmount}
-            stroke="#2dd4bf"
-            strokeDasharray="5 5"
-            label={{
-              value: t('budget'),
-              fill: '#2dd4bf',
-              fontSize: 11,
-              position: 'right',
-            }}
-          />
           <Bar
             dataKey="spent"
             name={t('spent')}
@@ -95,7 +95,7 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
             maxBarSize={50}
             shape={(props: BarShapeProps) => {
               const payload = props.payload as unknown as ChartData;
-              const fill = getBarColor(payload.spent, payload.budget);
+              const fill = getBarFill(payload.spent, payload.budget);
               const { x = 0, y = 0, width = 0, height = 0 } = props;
               const r = 6;
               return (
