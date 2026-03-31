@@ -60,7 +60,7 @@ const en = {
   dateFrom: 'From',
   dateTo: 'To',
   allCategories: 'All Categories',
-  clearFilters: 'Clear Filters',
+  resetFilters: 'Reset Filters',
   sortBy: 'Sort by',
 
   // Settings
@@ -200,7 +200,7 @@ const es: typeof en = {
   dateFrom: 'Desde',
   dateTo: 'Hasta',
   allCategories: 'Todas las Categorías',
-  clearFilters: 'Limpiar Filtros',
+  resetFilters: 'Restablecer Filtros',
   sortBy: 'Ordenar por',
   setBudget: 'Establecer Presupuesto Semanal',
   budgetAmount: 'Monto del Presupuesto',
@@ -331,7 +331,7 @@ const fr: typeof en = {
   dateFrom: 'Du',
   dateTo: 'Au',
   allCategories: 'Toutes les Catégories',
-  clearFilters: 'Effacer les Filtres',
+  resetFilters: 'Réinitialiser les Filtres',
   sortBy: 'Trier par',
   setBudget: 'Définir le Budget Hebdomadaire',
   budgetAmount: 'Montant du Budget',

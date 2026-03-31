@@ -5,6 +5,7 @@ import { useBudget } from '@/context/BudgetContext';
 import { Expense, FilterState, SortState } from '@/types';
 import { isInRange } from '@/utils/dates';
 import { getCategoryColor } from '@/utils/constants';
+import { subDays, format } from 'date-fns';
 import ExpenseFilters from './ExpenseFilters';
 
 interface ExpenseListProps {
@@ -12,14 +13,16 @@ interface ExpenseListProps {
   onToast: (message: string, type: 'success' | 'error') => void;
 }
 
+function getDefaultFilters(): FilterState {
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const thirtyDaysAgo = format(subDays(new Date(), 30), 'yyyy-MM-dd');
+  return { dateFrom: thirtyDaysAgo, dateTo: today, category: '', searchQuery: '' };
+}
+
 export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
   const { state, deleteExpense, t, tc, fc, fd } = useBudget();
-  const [filters, setFilters] = useState<FilterState>({
-    dateFrom: '',
-    dateTo: '',
-    category: '',
-    searchQuery: '',
-  });
+  const [defaultFilters] = useState(getDefaultFilters);
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [sort, setSort] = useState<SortState>({ field: 'date', direction: 'desc' });
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -81,7 +84,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
 
   return (
     <div className="space-y-4">
-      <ExpenseFilters filters={filters} onFilterChange={setFilters} />
+      <ExpenseFilters filters={filters} defaultFilters={defaultFilters} onFilterChange={setFilters} />
 
       {filteredExpenses.length === 0 ? (
         <div className="bg-slate-800/30 rounded-2xl border border-slate-600/20 p-12 text-center">

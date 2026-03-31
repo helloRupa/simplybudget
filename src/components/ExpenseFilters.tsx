@@ -5,21 +5,26 @@ import { FilterState } from '@/types';
 
 interface ExpenseFiltersProps {
   filters: FilterState;
+  defaultFilters: FilterState;
   onFilterChange: (filters: FilterState) => void;
 }
 
-export default function ExpenseFilters({ filters, onFilterChange }: ExpenseFiltersProps) {
+export default function ExpenseFilters({ filters, defaultFilters, onFilterChange }: ExpenseFiltersProps) {
   const { state, t, tc } = useBudget();
 
   function updateFilter(key: keyof FilterState, value: string) {
     onFilterChange({ ...filters, [key]: value });
   }
 
-  function clearFilters() {
-    onFilterChange({ dateFrom: '', dateTo: '', category: '', searchQuery: '' });
+  function resetFilters() {
+    onFilterChange(defaultFilters);
   }
 
-  const hasActiveFilters = filters.dateFrom || filters.dateTo || filters.category || filters.searchQuery;
+  const hasActiveFilters =
+    filters.dateFrom !== defaultFilters.dateFrom ||
+    filters.dateTo !== defaultFilters.dateTo ||
+    filters.category !== defaultFilters.category ||
+    filters.searchQuery !== defaultFilters.searchQuery;
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-4">
@@ -27,10 +32,10 @@ export default function ExpenseFilters({ filters, onFilterChange }: ExpenseFilte
         <h3 className="text-sm font-semibold text-slate-300">{t('filters')}</h3>
         {hasActiveFilters && (
           <button
-            onClick={clearFilters}
+            onClick={resetFilters}
             className="text-xs text-teal-400 hover:text-teal-300 transition-colors"
           >
-            {t('clearFilters')}
+            {t('resetFilters')}
           </button>
         )}
       </div>
