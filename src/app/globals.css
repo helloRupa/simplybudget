@@ -65,3 +65,23 @@ select option {
 input, textarea, select, button, a, [class*="transition"] {
   transition-property: all;
 }
+
+/* Highlight pulse for edit mode */
+@keyframes highlight-pulse {
+  0% {
+    border-color: rgba(45, 212, 191, 0);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0);
+  }
+  20% {
+    border-color: rgba(45, 212, 191, 0.8);
+    box-shadow: 0 0 20px 4px rgba(45, 212, 191, 0.3), inset 0 0 20px 2px rgba(45, 212, 191, 0.05);
+  }
+  100% {
+    border-color: rgba(100, 116, 139, 0.3);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0);
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 1.2s ease-out forwards;
+}

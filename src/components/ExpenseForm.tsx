@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import { Expense } from '@/types';
 import { toISODate } from '@/utils/dates';
@@ -19,6 +19,8 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(toISODate(new Date()));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isPulsing, setIsPulsing] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editingExpense) {
@@ -26,6 +28,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
       setCategory(editingExpense.category);
       setDescription(editingExpense.description);
       setDate(editingExpense.date);
+      setIsPulsing(true);
     }
   }, [editingExpense]);
 
@@ -81,7 +84,11 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   }
 
   return (
-    <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
+    <div
+      ref={formRef}
+      className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6${isPulsing ? ' highlight-pulse' : ''}`}
+      onAnimationEnd={() => setIsPulsing(false)}
+    >
       <h2 className="text-lg font-semibold text-white mb-4">
         {editingExpense ? t('editExpense') : t('addExpense')}
       </h2>
