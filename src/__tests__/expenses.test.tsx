@@ -3,10 +3,17 @@ import userEvent from '@testing-library/user-event';
 import { BudgetProvider } from '@/context/BudgetContext';
 import ExpenseForm from '@/components/ExpenseForm';
 import ExpenseList from '@/components/ExpenseList';
+import Settings from '@/components/Settings';
 import { Expense } from '@/types';
 import { STORAGE_KEYS, DEFAULT_CATEGORIES } from '@/utils/constants';
 import { format, subDays } from 'date-fns';
 import { useState, useCallback } from 'react';
+
+// Mock RecurringExpenseManager used inside Settings
+jest.mock('../components/RecurringExpenseManager', () => ({
+  __esModule: true,
+  default: () => <div data-testid="recurring-manager" />,
+}));
 
 const fiveDaysAgo = format(subDays(new Date(), 5), 'yyyy-MM-dd');
 const tenDaysAgo = format(subDays(new Date(), 10), 'yyyy-MM-dd');
@@ -25,10 +32,10 @@ function makeExpense(overrides: Partial<Expense> = {}): Expense {
   };
 }
 
-function seedLocalStorage(expenses: Expense[] = []) {
+function seedLocalStorage(expenses: Expense[] = [], categories: string[] = [...DEFAULT_CATEGORIES]) {
   localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(expenses));
   localStorage.setItem(STORAGE_KEYS.WEEKLY_BUDGET, JSON.stringify(200));
-  localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify([...DEFAULT_CATEGORIES]));
+  localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
   localStorage.setItem(STORAGE_KEYS.FIRST_USE_DATE, JSON.stringify(sixtyDaysAgo));
   localStorage.setItem(STORAGE_KEYS.LOCALE, JSON.stringify('en'));
   localStorage.setItem(STORAGE_KEYS.CURRENCY, JSON.stringify('USD'));
@@ -419,5 +426,151 @@ describe('Expenses view', () => {
       expect(within(rows[1]).getByText('$5.00')).toBeInTheDocument();
       expect(within(rows[2]).getByText('$100.00')).toBeInTheDocument();
     });
+  });
+});
+
+// Combined Settings + Expenses view to test cross-view interactions
+function SettingsAndExpensesView() {
+  const [activeTab, setActiveTab] = useState<'expenses' | 'settings'>('settings');
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = useCallback((message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+  }, []);
+
+  return (
+    <>
+      <button onClick={() => setActiveTab('expenses')}>Go to Expenses</button>
+      <button onClick={() => setActiveTab('settings')}>Go to Settings</button>
+
+      {activeTab === 'settings' && <Settings onToast={showToast} />}
+      {activeTab === 'expenses' && (
+        <>
+          <ExpenseForm
+            editingExpense={editingExpense}
+            onDone={() => setEditingExpense(null)}
+            onToast={showToast}
+          />
+          <ExpenseList onEdit={setEditingExpense} onToast={showToast} />
+        </>
+      )}
+      {toast && <div data-testid="toast">{toast.message}</div>}
+    </>
+  );
+}
+
+describe('Expenses with deleted category', () => {
+  it('still displays an expense whose category was deleted', async () => {
+    const user = userEvent.setup();
+    const categories = [...DEFAULT_CATEGORIES, 'Hobbies'];
+    const expenses = [makeExpense({ description: 'Guitar strings', category: 'Hobbies' })];
+    seedLocalStorage(expenses, categories);
+
+    render(
+      <BudgetProvider>
+        <SettingsAndExpensesView />
+      </BudgetProvider>
+    );
+
+    // Start on Settings — delete the Hobbies category
+    await screen.findByText('Manage Categories');
+    const section = screen.getByText('Manage Categories').closest('[class*="rounded-2xl"]')!;
+    const deleteButton = within(section as HTMLElement).getByTitle('Delete');
+    await user.click(deleteButton);
+
+    // Switch to Expenses
+    await user.click(screen.getByText('Go to Expenses'));
+
+    // The expense should still be visible with its category name
+    const table = await waitFor(() => screen.getByRole('table'));
+    expect(within(table).getByText('Guitar strings')).toBeInTheDocument();
+    expect(within(table).getByText('Hobbies')).toBeInTheDocument();
+  });
+
+  it('can edit an expense whose category was deleted and assign a new category', async () => {
+    const user = userEvent.setup();
+    const categories = [...DEFAULT_CATEGORIES, 'Hobbies'];
+    const expenses = [makeExpense({ description: 'Guitar strings', amount: 20, category: 'Hobbies' })];
+    seedLocalStorage(expenses, categories);
+
+    render(
+      <BudgetProvider>
+        <SettingsAndExpensesView />
+      </BudgetProvider>
+    );
+
+    // Delete the Hobbies category in Settings
+    await screen.findByText('Manage Categories');
+    const section = screen.getByText('Manage Categories').closest('[class*="rounded-2xl"]')!;
+    const deleteButton = within(section as HTMLElement).getByTitle('Delete');
+    await user.click(deleteButton);
+
+    // Switch to Expenses
+    await user.click(screen.getByText('Go to Expenses'));
+
+    // Click Edit on the expense
+    const table = await waitFor(() => screen.getByRole('table'));
+    await user.click(within(table).getByRole('button', { name: /^edit$/i }));
+
+    // Form should be in edit mode
+    expect(await screen.findByText('Edit Expense')).toBeInTheDocument();
+
+    // The category select won't have "Hobbies" as an option anymore,
+    // so it falls back to no selection. Pick a valid category.
+    const formCategorySelect = screen.getAllByRole('combobox').find(
+      (s) => within(s).queryByText('Select category') !== null,
+    )!;
+    await user.selectOptions(formCategorySelect, 'Entertainment');
+
+    await user.click(screen.getByRole('button', { name: /update/i }));
+
+    // Expense should now show Entertainment instead of Hobbies
+    await waitFor(() => {
+      expect(within(table).getByText('Entertainment')).toBeInTheDocument();
+    });
+    expect(within(table).getByText('Guitar strings')).toBeInTheDocument();
+    expect(within(table).queryByText('Hobbies')).not.toBeInTheDocument();
+  });
+
+  it('preserves the expense amount and description when reassigning category', async () => {
+    const user = userEvent.setup();
+    const categories = [...DEFAULT_CATEGORIES, 'Hobbies'];
+    const expenses = [makeExpense({ description: 'Guitar strings', amount: 42.5, category: 'Hobbies' })];
+    seedLocalStorage(expenses, categories);
+
+    render(
+      <BudgetProvider>
+        <SettingsAndExpensesView />
+      </BudgetProvider>
+    );
+
+    // Delete category, switch to expenses, edit
+    await screen.findByText('Manage Categories');
+    const section = screen.getByText('Manage Categories').closest('[class*="rounded-2xl"]')!;
+    await user.click(within(section as HTMLElement).getByTitle('Delete'));
+    await user.click(screen.getByText('Go to Expenses'));
+
+    const table = await waitFor(() => screen.getByRole('table'));
+    await user.click(within(table).getByRole('button', { name: /^edit$/i }));
+
+    await screen.findByText('Edit Expense');
+
+    // Amount and description should be preserved in the form
+    expect(screen.getByDisplayValue('42.5')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Guitar strings')).toBeInTheDocument();
+
+    // Reassign category and save
+    const formCategorySelect = screen.getAllByRole('combobox').find(
+      (s) => within(s).queryByText('Select category') !== null,
+    )!;
+    await user.selectOptions(formCategorySelect, 'Other');
+    await user.click(screen.getByRole('button', { name: /update/i }));
+
+    // Verify the amount is still correct
+    await waitFor(() => {
+      expect(within(table).getByText('$42.50')).toBeInTheDocument();
+    });
+    expect(within(table).getByText('Guitar strings')).toBeInTheDocument();
   });
 });
