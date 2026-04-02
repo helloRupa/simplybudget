@@ -18,6 +18,18 @@ function buildDate(year: number, month: number, day: number): string {
   return toISODate(new Date(year, month, clamped));
 }
 
+function buildExpense(re: RecurringExpense, date: string): Expense {
+  return {
+    id: uuidv4(),
+    amount: re.amount,
+    category: re.category,
+    description: re.description,
+    date,
+    createdAt: new Date().toISOString(),
+    recurringExpenseId: re.id,
+  };
+}
+
 /** Migrate legacy recurring expenses that lack a frequency field */
 function ensureFrequency(re: RecurringExpense): RecurringExpense {
   if (!re.frequency) {
@@ -56,15 +68,7 @@ function generateWeekly(re: RecurringExpense, today: Date, todayStr: string): { 
     }
     if (re.endDate && dateStr > re.endDate) break;
 
-    expenses.push({
-      id: uuidv4(),
-      amount: re.amount,
-      category: re.category,
-      description: re.description,
-      date: dateStr,
-      createdAt: new Date().toISOString(),
-      recurringExpenseId: re.id,
-    });
+    expenses.push(buildExpense(re, dateStr));
     lastDate = dateStr;
     cursor = addWeeks(cursor, 1);
   }
@@ -72,12 +76,9 @@ function generateWeekly(re: RecurringExpense, today: Date, todayStr: string): { 
   return { expenses, lastDate };
 }
 
-function generateMonthly(re: RecurringExpense, today: Date, todayStr: string): { expenses: Expense[]; lastDate: string | null } {
+function generateMonthly(re: RecurringExpense, todayStr: string): { expenses: Expense[]; lastDate: string | null } {
   const expenses: Expense[] = [];
   let lastDate = re.lastGeneratedDate;
-  const todayYear = today.getFullYear();
-  const todayMonth = today.getMonth();
-  const todayDay = today.getDate();
 
   let genStart: Date;
   if (re.lastGeneratedDate) {
@@ -93,27 +94,15 @@ function generateMonthly(re: RecurringExpense, today: Date, todayStr: string): {
     const clampedDay = clampDay(re.dayOfMonth, year, month);
     const expenseDate = buildDate(year, month, clampedDay);
 
-    if (year > todayYear || (year === todayYear && month > todayMonth) ||
-        (year === todayYear && month === todayMonth && clampedDay > todayDay)) {
-      break;
-    }
+    if (expenseDate > todayStr) break;
     if (expenseDate < re.startDate) {
       month++;
       if (month > 11) { month = 0; year++; }
       continue;
     }
     if (re.endDate && expenseDate > re.endDate) break;
-    if (expenseDate > todayStr) break;
 
-    expenses.push({
-      id: uuidv4(),
-      amount: re.amount,
-      category: re.category,
-      description: re.description,
-      date: expenseDate,
-      createdAt: new Date().toISOString(),
-      recurringExpenseId: re.id,
-    });
+    expenses.push(buildExpense(re, expenseDate));
     lastDate = expenseDate;
 
     month++;
@@ -123,7 +112,7 @@ function generateMonthly(re: RecurringExpense, today: Date, todayStr: string): {
   return { expenses, lastDate };
 }
 
-function generateAnnually(re: RecurringExpense, today: Date, todayStr: string): { expenses: Expense[]; lastDate: string | null } {
+function generateAnnually(re: RecurringExpense, todayStr: string): { expenses: Expense[]; lastDate: string | null } {
   const expenses: Expense[] = [];
   let lastDate = re.lastGeneratedDate;
   const targetMonth = re.monthOfYear ?? parseISO(re.startDate).getMonth();
@@ -143,15 +132,7 @@ function generateAnnually(re: RecurringExpense, today: Date, todayStr: string): 
     if (expenseDate < re.startDate) continue;
     if (re.endDate && expenseDate > re.endDate) break;
 
-    expenses.push({
-      id: uuidv4(),
-      amount: re.amount,
-      category: re.category,
-      description: re.description,
-      date: expenseDate,
-      createdAt: new Date().toISOString(),
-      recurringExpenseId: re.id,
-    });
+    expenses.push(buildExpense(re, expenseDate));
     lastDate = expenseDate;
   }
 
@@ -180,11 +161,11 @@ export function generatePendingExpenses(
         result = generateWeekly(updated, today, todayStr);
         break;
       case 'annually':
-        result = generateAnnually(updated, today, todayStr);
+        result = generateAnnually(updated, todayStr);
         break;
       case 'monthly':
       default:
-        result = generateMonthly(updated, today, todayStr);
+        result = generateMonthly(updated, todayStr);
         break;
     }
 
