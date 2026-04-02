@@ -88,7 +88,7 @@ export default function Settings({ onToast }: SettingsProps) {
       {/* Weekly Budget Setting */}
       <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">{t('setBudget')}</h2>
-        <form onSubmit={handleBudgetSubmit} className="flex gap-3">
+        <form onSubmit={handleBudgetSubmit} noValidate className="flex gap-3">
           <div className="relative flex-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">{currencySymbol}</span>
             <input

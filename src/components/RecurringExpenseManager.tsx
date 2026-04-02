@@ -135,7 +135,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-slate-700/30 rounded-xl border border-slate-600/20 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="mb-6 p-4 bg-slate-700/30 rounded-xl border border-slate-600/20 space-y-4">
           <h3 className="text-sm font-semibold text-slate-300">
             {editingId ? t('editRecurringExpense') : t('addRecurringExpense')}
           </h3>
