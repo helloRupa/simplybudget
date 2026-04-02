@@ -6,7 +6,6 @@ import {
   format,
   parseISO,
   isWithinInterval,
-  differenceInWeeks,
   addWeeks,
 } from 'date-fns';
 import { WeeklyBudget } from '@/types';
@@ -55,16 +54,6 @@ export function isInRange(dateStr: string, from: string, to: string): boolean {
 
 export function toISODate(date: Date): string {
   return format(date, 'yyyy-MM-dd');
-}
-
-export function getTotalWeeksSinceStart(firstUseDate: string): number {
-  try {
-    const start = parseISO(firstUseDate);
-    const now = new Date();
-    return Math.max(1, differenceInWeeks(now, start) + 1);
-  } catch {
-    return 1;
-  }
 }
 
 export function getBudgetForWeek(weekStart: Date, budgetHistory: WeeklyBudget[]): number {

@@ -9,15 +9,15 @@ function csvCell(value: string): string {
 
 export function exportToCSV(
   expenses: Expense[],
-  t: (key: string) => string,
-  tc: (category: string) => string,
-  fd: (dateStr: string) => string,
+  translate: (key: string) => string,
+  translateCategory: (category: string) => string,
+  formatDate: (dateStr: string) => string,
 ): void {
-  const headers = [t('date'), t('amount'), t('category'), t('description')];
+  const headers = [translate('date'), translate('amount'), translate('category'), translate('description')];
   const rows = expenses.map((e) => [
-    csvCell(fd(e.date)),
+    csvCell(formatDate(e.date)),
     e.amount.toFixed(2),
-    csvCell(tc(e.category)),
+    csvCell(translateCategory(e.category)),
     csvCell(e.description),
   ]);
 
