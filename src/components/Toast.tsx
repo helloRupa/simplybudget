@@ -12,12 +12,14 @@ interface ToastProps {
 export default function Toast({ message, type = 'success', onClose, duration = 3000 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(false);
 
+  const close = () => {
+    setIsVisible(false);
+    setTimeout(onClose, 300);
+  };
+
   useEffect(() => {
     setIsVisible(true);
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(onClose, 300);
-    }, duration);
+    const timer = setTimeout(close, duration);
     return () => clearTimeout(timer);
   }, [duration, onClose]);
 
@@ -41,7 +43,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
     >
       <span className="text-lg font-bold">{icons[type]}</span>
       <span className="text-sm font-medium">{message}</span>
-      <button onClick={() => { setIsVisible(false); setTimeout(onClose, 300); }} className="ml-2 text-white/70 hover:text-white">
+      <button onClick={close} className="ml-2 text-white/70 hover:text-white">
         ✕
       </button>
     </div>

@@ -14,17 +14,15 @@ export default function Dashboard() {
     const { start: weekStart, end: weekEnd } = getWeekRange();
     const { start: monthStart, end: monthEnd } = getMonthRange();
 
-    const weekExpenses = state.expenses.filter((e) => {
-      try {
-        return isWithinInterval(parseISO(e.date), { start: weekStart, end: weekEnd });
-      } catch { return false; }
-    });
+    const expensesInRange = (start: Date, end: Date) =>
+      state.expenses.filter((e) => {
+        try {
+          return isWithinInterval(parseISO(e.date), { start, end });
+        } catch { return false; }
+      });
 
-    const monthExpenses = state.expenses.filter((e) => {
-      try {
-        return isWithinInterval(parseISO(e.date), { start: monthStart, end: monthEnd });
-      } catch { return false; }
-    });
+    const weekExpenses = expensesInRange(weekStart, weekEnd);
+    const monthExpenses = expensesInRange(monthStart, monthEnd);
 
     const spentThisWeek = weekExpenses.reduce((sum, e) => sum + e.amount, 0);
     const spentThisMonth = monthExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -54,12 +52,7 @@ export default function Dashboard() {
 
     // Weekly spending data for chart
     const weeklyChartData = weekRanges.slice(-8).map((range) => {
-      const weekExpenseTotal = state.expenses
-        .filter((e) => {
-          try {
-            return isWithinInterval(parseISO(e.date), { start: range.start, end: range.end });
-          } catch { return false; }
-        })
+      const weekExpenseTotal = expensesInRange(range.start, range.end)
         .reduce((sum, e) => sum + e.amount, 0);
 
       return {
@@ -151,7 +144,7 @@ export default function Dashboard() {
         <SummaryCard
           title={stats.totalSavedAllTime >= 0 ? t('totalSavedAllTime') : t('totalOverspentAllTime')}
           value={fc(Math.abs(stats.totalSavedAllTime))}
-          subtitle={stats.totalSavedAllTime >= 0 ? t('allTime') : t('allTime')}
+          subtitle={t('allTime')}
           tooltip={t('totalSavedTooltip')
             .replace('{startDate}', fd(state.firstUseDate))
             .replace('{weeks}', String(stats.numWeeks))

@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BudgetProvider } from '@/context/BudgetContext';
-import Header from '@/components/Header';
+import Header, { Tab } from '@/components/Header';
 import AboutModal from '@/components/AboutModal';
 import { STORAGE_KEYS, DEFAULT_CATEGORIES } from '@/utils/constants';
 import { format, startOfWeek, subWeeks } from 'date-fns';
@@ -26,7 +26,7 @@ function seedLocalStorage() {
 
 // Mirrors page.tsx: Header + AboutModal wired together with tab and modal state
 function HeaderWithModal() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'expenses' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAbout, setShowAbout] = useState(false);
 
   return (

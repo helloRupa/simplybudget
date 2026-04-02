@@ -20,9 +20,10 @@ interface BackupData {
 }
 
 export function exportBackup(state: BackupData['data']): void {
+  const now = new Date();
   const backup: BackupData = {
     version: BACKUP_VERSION,
-    exportedAt: new Date().toISOString(),
+    exportedAt: now.toISOString(),
     data: state,
   };
   const json = JSON.stringify(backup, null, 2);
@@ -30,7 +31,7 @@ export function exportBackup(state: BackupData['data']): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `simplybudget-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  link.download = `simplybudget-backup-${now.toISOString().slice(0, 10)}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

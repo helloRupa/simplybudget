@@ -33,7 +33,7 @@ export const SUPPORTED_CURRENCIES: Record<CurrencyCode, string> = {
   CHF: 'Swiss Franc (CHF)',
 };
 
-export const CATEGORY_COLORS: Record<string, string> = {
+const CATEGORY_COLORS: Record<string, string> = {
   Food: '#f97316',
   Transportation: '#3b82f6',
   Entertainment: '#a855f7',

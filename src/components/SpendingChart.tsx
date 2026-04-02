@@ -9,7 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import type { BarShapeProps } from 'recharts';
 import { TranslationKey } from '@/i18n/locales';
 
 interface ChartData {
@@ -37,7 +36,7 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
   if (data.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-slate-500">
-        No data to display
+        {t('noChartData')}
       </div>
     );
   }
@@ -91,10 +90,9 @@ export default function SpendingChart({ data, t, fc, currencySymbol }: SpendingC
           <Bar
             dataKey="spent"
             name={t('spent')}
-            radius={[6, 6, 0, 0]}
             maxBarSize={50}
-            shape={(props: BarShapeProps) => {
-              const payload = props.payload as unknown as ChartData;
+            shape={(props: { x?: number; y?: number; width?: number; height?: number; payload?: ChartData }) => {
+              const payload = props.payload as ChartData;
               const fill = getBarFill(payload.spent, payload.budget);
               const { x = 0, y = 0, width = 0, height = 0 } = props;
               const r = 6;

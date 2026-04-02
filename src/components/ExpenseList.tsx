@@ -19,6 +19,72 @@ function getDefaultFilters(): FilterState {
   return { dateFrom: thirtyDaysAgo, dateTo: today, category: '', searchQuery: '' };
 }
 
+function CategoryBadge({ category }: { category: string }) {
+  const { tc } = useBudget();
+  const color = getCategoryColor(category);
+  return (
+    <span
+      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+      style={{ backgroundColor: color + '33', border: `1px solid ${color}55` }}
+    >
+      <span className="w-2 h-2 rounded-full mr-1.5" style={{ backgroundColor: color }} />
+      {tc(category)}
+    </span>
+  );
+}
+
+function RecurringIcon() {
+  return (
+    <svg className="w-3.5 h-3.5 text-teal-400/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+  );
+}
+
+function SortIndicator({ field, sort }: { field: SortState['field']; sort: SortState }) {
+  if (sort.field !== field) return <span className="text-slate-600 ml-1">↕</span>;
+  return <span className="text-slate-300 ml-1">{sort.direction === 'desc' ? '↓' : '↑'}</span>;
+}
+
+interface ExpenseActionsProps {
+  expense: Expense;
+  deletingId: string | null;
+  onEdit: (expense: Expense) => void;
+  onDelete: (id: string) => void;
+  onConfirmDelete: (id: string) => void;
+  onCancelDelete: () => void;
+  size: 'compact' | 'normal';
+}
+
+function ExpenseActions({ expense, deletingId, onEdit, onDelete, onConfirmDelete, onCancelDelete, size }: ExpenseActionsProps) {
+  const { t } = useBudget();
+  const padding = size === 'compact' ? 'px-2.5 py-1' : 'px-3 py-1.5';
+
+  if (deletingId === expense.id) {
+    return (
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => onConfirmDelete(expense.id)} className={`text-xs ${padding} rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors`}>
+          {t('delete')}
+        </button>
+        <button onClick={onCancelDelete} className={`text-xs ${padding} rounded-lg bg-slate-600/30 text-slate-300 hover:bg-slate-600/50 transition-colors`}>
+          {t('cancel')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-2 justify-end">
+      <button onClick={() => onEdit(expense)} className={`text-xs ${padding} rounded-lg bg-teal-500/15 text-teal-300 hover:bg-teal-500/25 hover:text-white transition-colors`}>
+        {t('edit')}
+      </button>
+      <button onClick={() => onDelete(expense.id)} className={`text-xs ${padding} rounded-lg bg-red-500/10 text-red-400/70 hover:bg-red-500/20 hover:text-red-300 transition-colors`}>
+        {t('delete')}
+      </button>
+    </div>
+  );
+}
+
 export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
   const { state, deleteExpense, t, tc, fc, fd } = useBudget();
   const [defaultFilters] = useState(getDefaultFilters);
@@ -77,11 +143,6 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
     onToast(t('expenseDeleted'), 'success');
   }
 
-  const SortIndicator = ({ field }: { field: SortState['field'] }) => {
-    if (sort.field !== field) return <span className="text-slate-600 ml-1">↕</span>;
-    return <span className="text-slate-300 ml-1">{sort.direction === 'desc' ? '↓' : '↑'}</span>;
-  };
-
   return (
     <div className="space-y-4">
       <ExpenseFilters filters={filters} defaultFilters={defaultFilters} onFilterChange={setFilters} />
@@ -106,13 +167,13 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                     className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 cursor-pointer hover:text-slate-200"
                     onClick={() => handleSort('date')}
                   >
-                    {t('date')} <SortIndicator field="date" />
+                    {t('date')} <SortIndicator field="date" sort={sort} />
                   </th>
                   <th
                     className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 cursor-pointer hover:text-slate-200"
                     onClick={() => handleSort('category')}
                   >
-                    {t('category')} <SortIndicator field="category" />
+                    {t('category')} <SortIndicator field="category" sort={sort} />
                   </th>
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3">
                     {t('description')}
@@ -121,7 +182,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                     className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 cursor-pointer hover:text-slate-200"
                     onClick={() => handleSort('amount')}
                   >
-                    {t('amount')} <SortIndicator field="amount" />
+                    {t('amount')} <SortIndicator field="amount" sort={sort} />
                   </th>
                   <th className="text-right text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3">
                     {t('actions')}
@@ -136,62 +197,27 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                   >
                     <td className="px-5 py-3 text-sm text-slate-300">{fd(expense.date)}</td>
                     <td className="px-5 py-3">
-                      <span
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-                        style={{ backgroundColor: getCategoryColor(expense.category) + '33', border: `1px solid ${getCategoryColor(expense.category)}55` }}
-                      >
-                        <span
-                          className="w-2 h-2 rounded-full mr-1.5"
-                          style={{ backgroundColor: getCategoryColor(expense.category) }}
-                        />
-                        {tc(expense.category)}
-                      </span>
+                      <CategoryBadge category={expense.category} />
                     </td>
                     <td className="px-5 py-3 text-sm text-slate-300">
                       <span className="inline-flex items-center gap-1.5">
                         {expense.description || <span className="text-slate-600 italic">—</span>}
-                        {expense.recurringExpenseId && (
-                          <svg className="w-3.5 h-3.5 text-teal-400/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                        )}
+                        {expense.recurringExpenseId && <RecurringIcon />}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-sm text-right font-semibold text-amber-300">
                       {fc(expense.amount)}
                     </td>
                     <td className="px-5 py-3 text-right">
-                      {deletingId === expense.id ? (
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => confirmDelete(expense.id)}
-                            className="text-xs px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors"
-                          >
-                            {t('delete')}
-                          </button>
-                          <button
-                            onClick={() => setDeletingId(null)}
-                            className="text-xs px-2.5 py-1 rounded-lg bg-slate-600/30 text-slate-300 hover:bg-slate-600/50 transition-colors"
-                          >
-                            {t('cancel')}
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => onEdit(expense)}
-                            className="text-xs px-2.5 py-1 rounded-lg bg-teal-500/15 text-teal-300 hover:bg-teal-500/25 hover:text-white transition-colors"
-                          >
-                            {t('edit')}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(expense.id)}
-                            className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400/70 hover:bg-red-500/20 hover:text-red-300 transition-colors"
-                          >
-                            {t('delete')}
-                          </button>
-                        </div>
-                      )}
+                      <ExpenseActions
+                        expense={expense}
+                        deletingId={deletingId}
+                        onEdit={onEdit}
+                        onDelete={handleDelete}
+                        onConfirmDelete={confirmDelete}
+                        onCancelDelete={() => setDeletingId(null)}
+                        size="compact"
+                      />
                     </td>
                   </tr>
                 ))}
@@ -208,13 +234,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <span
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-                      style={{ backgroundColor: getCategoryColor(expense.category) + '33', border: `1px solid ${getCategoryColor(expense.category)}55` }}
-                    >
-                      <span className="w-2 h-2 rounded-full mr-1.5" style={{ backgroundColor: getCategoryColor(expense.category) }} />
-                      {tc(expense.category)}
-                    </span>
+                    <CategoryBadge category={expense.category} />
                     <p className="text-xs text-slate-500 mt-1">{fd(expense.date)}</p>
                   </div>
                   <p className="text-lg font-bold text-amber-300">{fc(expense.amount)}</p>
@@ -222,34 +242,18 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                 {(expense.description || expense.recurringExpenseId) && (
                   <p className="text-sm text-slate-300 mb-3 inline-flex items-center gap-1.5">
                     {expense.description}
-                    {expense.recurringExpenseId && (
-                      <svg className="w-3.5 h-3.5 text-teal-400/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                    )}
+                    {expense.recurringExpenseId && <RecurringIcon />}
                   </p>
                 )}
-                <div className="flex gap-2 justify-end">
-                  {deletingId === expense.id ? (
-                    <>
-                      <button onClick={() => confirmDelete(expense.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-500/20 text-red-300">
-                        {t('delete')}
-                      </button>
-                      <button onClick={() => setDeletingId(null)} className="text-xs px-3 py-1.5 rounded-lg bg-slate-600/30 text-slate-300">
-                        {t('cancel')}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => onEdit(expense)} className="text-xs px-3 py-1.5 rounded-lg bg-teal-500/15 text-teal-300">
-                        {t('edit')}
-                      </button>
-                      <button onClick={() => handleDelete(expense.id)} className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400/70">
-                        {t('delete')}
-                      </button>
-                    </>
-                  )}
-                </div>
+                <ExpenseActions
+                  expense={expense}
+                  deletingId={deletingId}
+                  onEdit={onEdit}
+                  onDelete={handleDelete}
+                  onConfirmDelete={confirmDelete}
+                  onCancelDelete={() => setDeletingId(null)}
+                  size="normal"
+                />
               </div>
             ))}
           </div>

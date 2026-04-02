@@ -89,8 +89,6 @@ function reducer(state: State, action: Action): State {
         ...state,
         recurringExpenses: state.recurringExpenses.filter((r) => r.id !== action.payload),
       };
-    default:
-      return state;
   }
 }
 
@@ -127,6 +125,8 @@ interface BudgetContextValue {
   intlLocale: string;
   isLoaded: boolean;
 }
+
+const LOCALE_TO_INTL: Record<LocaleKey, string> = { en: 'en-US', es: 'es', fr: 'fr' };
 
 const BudgetContext = createContext<BudgetContextValue | null>(null);
 
@@ -270,19 +270,17 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
   const t = useCallback(
     (key: TranslationKey): string => {
-      return locales[state.locale]?.[key] ?? locales.en[key] ?? key;
+      return locales[state.locale][key];
     },
     [state.locale]
   );
 
   const tc = useCallback(
     (category: string): string => {
-      return categoryTranslations[state.locale]?.[category] ?? category;
+      return categoryTranslations[state.locale][category] ?? category;
     },
     [state.locale]
   );
-
-  const LOCALE_TO_INTL: Record<LocaleKey, string> = { en: 'en-US', es: 'es', fr: 'fr' };
 
   const fc = useCallback(
     (amount: number): string => {

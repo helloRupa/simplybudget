@@ -79,6 +79,7 @@ const en = {
   exportCSV: 'Export as CSV',
   exportBackup: 'Export Backup (JSON)',
   importBackup: 'Import Backup',
+  csvExported: 'CSV exported!',
   backupExported: 'Backup exported!',
   backupImported: 'Backup imported successfully!',
   backupImportFailed: 'Failed to import backup.',
@@ -153,6 +154,7 @@ const en = {
   aboutBuiltBy: 'Built by',
   aboutBuiltWith: 'Built with',
   aboutVersion: 'Version',
+  noChartData: 'No data to display',
 };
 
 const es: typeof en = {
@@ -217,6 +219,7 @@ const es: typeof en = {
   exportCSV: 'Exportar como CSV',
   exportBackup: 'Exportar Respaldo (JSON)',
   importBackup: 'Importar Respaldo',
+  csvExported: '¡CSV exportado!',
   backupExported: '¡Respaldo exportado!',
   backupImported: '¡Respaldo importado exitosamente!',
   backupImportFailed: 'Error al importar el respaldo.',
@@ -284,6 +287,7 @@ const es: typeof en = {
   aboutBuiltBy: 'Creado por',
   aboutBuiltWith: 'Construido con',
   aboutVersion: 'Versión',
+  noChartData: 'No hay datos para mostrar',
 };
 
 const fr: typeof en = {
@@ -348,6 +352,7 @@ const fr: typeof en = {
   exportCSV: 'Exporter en CSV',
   exportBackup: 'Exporter la Sauvegarde (JSON)',
   importBackup: 'Importer une Sauvegarde',
+  csvExported: 'CSV exporté!',
   backupExported: 'Sauvegarde exportée!',
   backupImported: 'Sauvegarde importée avec succès!',
   backupImportFailed: "Échec de l'importation de la sauvegarde.",
@@ -415,6 +420,7 @@ const fr: typeof en = {
   aboutBuiltBy: 'Créé par',
   aboutBuiltWith: 'Construit avec',
   aboutVersion: 'Version',
+  noChartData: 'Aucune donnée à afficher',
 };
 
 export const locales: Record<LocaleKey, typeof en> = { en, es, fr };

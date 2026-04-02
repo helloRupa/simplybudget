@@ -32,13 +32,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           <img
             src={moneyFrog.src}
             alt="Money Frog"
-            className="w-20 h-20 mb-3"
-            style={{
-              backgroundColor: '#fff',
-              padding: '8px',
-              borderRadius: '24px',
-              border: '3px solid #2db2a2',
-            }}
+            className="w-20 h-20 mb-3 bg-white p-2 rounded-3xl border-[3px] border-teal-500"
           />
           <h2 className="text-2xl font-extrabold tracking-tight">
             <span className="text-white">Simply</span>

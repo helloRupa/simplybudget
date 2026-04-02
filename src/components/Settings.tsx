@@ -48,7 +48,7 @@ export default function Settings({ onToast }: SettingsProps) {
       return;
     }
     exportToCSV(state.expenses, t as (key: string) => string, tc, fd);
-    onToast('CSV exported!', 'success');
+    onToast(t('csvExported'), 'success');
   }
 
   function handleExportBackup() {
@@ -76,8 +76,8 @@ export default function Settings({ onToast }: SettingsProps) {
       });
       setBudgetInput((data.weeklyBudget ?? 200).toString());
       onToast(t('backupImported'), 'success');
-    } catch (err) {
-      onToast(err instanceof Error ? err.message : t('backupImportFailed'), 'error');
+    } catch {
+      onToast(t('backupImportFailed'), 'error');
     }
   }
 

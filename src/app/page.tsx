@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { BudgetProvider } from '@/context/BudgetContext';
-import Header from '@/components/Header';
+import Header, { Tab } from '@/components/Header';
 import Dashboard from '@/components/Dashboard';
 import ExpenseForm from '@/components/ExpenseForm';
 import ExpenseList from '@/components/ExpenseList';
@@ -10,8 +10,6 @@ import Settings from '@/components/Settings';
 import Toast from '@/components/Toast';
 import AboutModal from '@/components/AboutModal';
 import { Expense } from '@/types';
-
-type Tab = 'dashboard' | 'expenses' | 'settings';
 
 function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');

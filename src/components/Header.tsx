@@ -4,10 +4,43 @@ import { useBudget } from '@/context/BudgetContext';
 import { LOCALE_NAMES, LocaleKey } from '@/i18n/locales';
 import moneyFrog from '../assets/images/moneyFrog.svg'
 
+export type Tab = 'dashboard' | 'expenses' | 'settings';
+
 interface HeaderProps {
-  activeTab: 'dashboard' | 'expenses' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'expenses' | 'settings') => void;
+  activeTab: Tab;
+  onTabChange: (tab: Tab) => void;
   onAboutClick: () => void;
+}
+
+interface TabButtonProps {
+  icon: React.ComponentType;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  variant: 'desktop' | 'mobile';
+}
+
+function TabButton({ icon: Icon, label, isActive, onClick, variant }: TabButtonProps) {
+  const baseClasses = 'flex items-center rounded-lg font-medium transition-all';
+  const activeClasses = variant === 'desktop'
+    ? 'bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/10 border border-teal-400/30'
+    : 'bg-teal-500/20 text-teal-300 border border-teal-400/30';
+  const inactiveClasses = variant === 'desktop'
+    ? 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+    : 'text-slate-400 hover:text-white hover:bg-slate-700/50';
+  const sizeClasses = variant === 'desktop'
+    ? 'gap-2 px-4 py-2 text-sm'
+    : 'flex-1 justify-center gap-1.5 px-3 py-2 text-xs';
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseClasses} ${sizeClasses} ${isActive ? activeClasses : inactiveClasses}`}
+    >
+      <Icon />
+      {label}
+    </button>
+  );
 }
 
 export default function Header({ activeTab, onTabChange, onAboutClick }: HeaderProps) {
@@ -24,7 +57,7 @@ export default function Header({ activeTab, onTabChange, onAboutClick }: HeaderP
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <img src={moneyFrog.src} alt="Money Frog" className="w-12 h-12" style={{backgroundColor: '#fff', padding: '4px', borderRadius: '16px', border: '2px solid #2db2a2'}} />
+            <img src={moneyFrog.src} alt="Money Frog" className="w-12 h-12 bg-white p-1 rounded-2xl border-2 border-teal-500" />
             <h1 className="text-2xl font-extrabold tracking-tight">
               <span className="text-white">Simply</span>
               <span className="text-teal-400">Budget</span>
@@ -40,18 +73,14 @@ export default function Header({ activeTab, onTabChange, onAboutClick }: HeaderP
 
           <nav className="hidden min-[800px]:flex items-center gap-1">
             {tabs.map((tab) => (
-              <button
+              <TabButton
                 key={tab.id}
+                icon={tab.icon}
+                label={tab.label}
+                isActive={activeTab === tab.id}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/10 border border-teal-400/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
-                }`}
-              >
-                <tab.icon />
-                {tab.label}
-              </button>
+                variant="desktop"
+              />
             ))}
           </nav>
 
@@ -71,18 +100,14 @@ export default function Header({ activeTab, onTabChange, onAboutClick }: HeaderP
         {/* Mobile nav */}
         <nav className="flex min-[800px]:hidden pb-3 gap-1">
           {tabs.map((tab) => (
-            <button
+            <TabButton
               key={tab.id}
+              icon={tab.icon}
+              label={tab.label}
+              isActive={activeTab === tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                activeTab === tab.id
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-400/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-              }`}
-            >
-              <tab.icon />
-              {tab.label}
-            </button>
+              variant="mobile"
+            />
           ))}
         </nav>
       </div>

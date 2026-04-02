@@ -315,7 +315,7 @@ describe('Settings', () => {
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       await user.upload(fileInput, file);
 
-      expect(await screen.findByTestId('toast')).toHaveTextContent(/could not parse/i);
+      expect(await screen.findByTestId('toast')).toHaveTextContent(/failed to import backup/i);
       expect(screen.getByTestId('toast')).toHaveAttribute('data-type', 'error');
     });
   });

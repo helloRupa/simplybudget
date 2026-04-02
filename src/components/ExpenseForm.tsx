@@ -32,6 +32,14 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
     }
   }, [editingExpense]);
 
+  function resetForm() {
+    setAmount('');
+    setCategory('');
+    setDescription('');
+    setDate(toISODate(new Date()));
+    setErrors({});
+  }
+
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
     if (!amount || parseFloat(amount) === 0) {
@@ -74,12 +82,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
       onToast(t('expenseAdded'), 'success');
     }
 
-    // Reset form
-    setAmount('');
-    setCategory('');
-    setDescription('');
-    setDate(toISODate(new Date()));
-    setErrors({});
+    resetForm();
     onDone();
   }
 
@@ -167,11 +170,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
             <button
               type="button"
               onClick={() => {
-                setAmount('');
-                setCategory('');
-                setDescription('');
-                setDate(toISODate(new Date()));
-                setErrors({});
+                resetForm();
                 onDone();
               }}
               className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-600/30 hover:bg-slate-600/50 transition-colors"

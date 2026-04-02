@@ -20,6 +20,8 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
     onFilterChange(defaultFilters);
   }
 
+  const inputClass = 'w-full bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400';
+
   const hasActiveFilters =
     filters.dateFrom !== defaultFilters.dateFrom ||
     filters.dateTo !== defaultFilters.dateTo ||
@@ -56,7 +58,7 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
             value={filters.searchQuery}
             onChange={(e) => updateFilter('searchQuery', e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full bg-slate-700/40 text-white text-sm rounded-xl pl-9 pr-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500"
+            className={`${inputClass} pl-9 pr-4 placeholder-slate-500`}
           />
         </div>
 
@@ -64,7 +66,7 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
         <select
           value={filters.category}
           onChange={(e) => updateFilter('category', e.target.value)}
-          className="bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          className={inputClass}
         >
           <option value="">{t('allCategories')}</option>
           {state.categories.map((cat) => (
@@ -78,7 +80,7 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
             type="date"
             value={filters.dateFrom}
             onChange={(e) => updateFilter('dateFrom', e.target.value)}
-            className="w-full bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className={inputClass}
             title={t('dateFrom')}
           />
         </div>
@@ -89,7 +91,7 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
             type="date"
             value={filters.dateTo}
             onChange={(e) => updateFilter('dateTo', e.target.value)}
-            className="w-full bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400"
+            className={inputClass}
             title={t('dateTo')}
           />
         </div>

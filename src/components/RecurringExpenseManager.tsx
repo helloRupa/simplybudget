@@ -50,7 +50,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
     setAmount(re.amount.toString());
     setCategory(re.category);
     setDescription(re.description);
-    setFrequency(re.frequency || 'monthly');
+    setFrequency(re.frequency);
     setDayOfMonth(re.dayOfMonth.toString());
     setDayOfWeek((re.dayOfWeek ?? 1).toString());
     setMonthOfYear((re.monthOfYear ?? 0).toString());
@@ -80,7 +80,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
     const data = {
       amount: Math.round(parsedAmount * 100) / 100,
       category,
-      description,
+      description: description.trim(),
       frequency,
       dayOfMonth: parseInt(dayOfMonth),
       dayOfWeek: parseInt(dayOfWeek),
@@ -108,8 +108,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
   }
 
   function frequencyLabel(re: RecurringExpense): string {
-    const freq = re.frequency || 'monthly';
-    switch (freq) {
+    switch (re.frequency) {
       case 'weekly':
         return `${t('weekly')}, ${t('everyWeek')} ${t(DAY_KEYS[re.dayOfWeek ?? 0])}`;
       case 'annually':
