@@ -228,12 +228,30 @@ describe('RecurringExpenseManager', () => {
   });
 
   describe('deleting a recurring expense', () => {
-    it('removes the recurring expense', async () => {
+    it('shows confirmation before deleting', async () => {
       const user = userEvent.setup();
       const recurring = [makeRecurring({ description: 'To remove' })];
       renderRecurring(recurring);
 
       await screen.findByText('To remove');
+      await user.click(screen.getByRole('button', { name: /^delete$/i }));
+
+      // First click shows confirmation — expense still visible, no toast yet
+      expect(screen.getByText('To remove')).toBeInTheDocument();
+      expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+
+      // Cancel dismisses confirmation
+      await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+      expect(screen.getByText('To remove')).toBeInTheDocument();
+    });
+
+    it('removes the recurring expense after confirming', async () => {
+      const user = userEvent.setup();
+      const recurring = [makeRecurring({ description: 'To remove' })];
+      renderRecurring(recurring);
+
+      await screen.findByText('To remove');
+      await user.click(screen.getByRole('button', { name: /^delete$/i }));
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
       expect(await screen.findByTestId('toast')).toHaveTextContent(/deleted/i);

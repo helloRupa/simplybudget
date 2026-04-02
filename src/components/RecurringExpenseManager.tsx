@@ -18,6 +18,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form state
   const [amount, setAmount] = useState('');
@@ -103,7 +104,12 @@ export default function RecurringExpenseManager({ onToast }: Props) {
   }
 
   function handleDelete(id: string) {
+    setDeletingId(id);
+  }
+
+  function confirmDelete(id: string) {
     deleteRecurringExpense(id);
+    setDeletingId(null);
     onToast(t('recurringExpenseDeleted'), 'success');
   }
 
@@ -334,18 +340,37 @@ export default function RecurringExpenseManager({ onToast }: Props) {
                 </p>
               </div>
               <div className="flex items-center gap-2 ml-3 shrink-0">
-                <button
-                  onClick={() => startEdit(re)}
-                  className="text-xs text-teal-400 hover:text-teal-300 transition-colors px-2 py-1"
-                >
-                  {t('edit')}
-                </button>
-                <button
-                  onClick={() => handleDelete(re.id)}
-                  className="text-xs text-red-400/60 hover:text-red-300 transition-colors px-2 py-1"
-                >
-                  {t('delete')}
-                </button>
+                {deletingId === re.id ? (
+                  <>
+                    <button
+                      onClick={() => confirmDelete(re.id)}
+                      className="text-xs px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors"
+                    >
+                      {t('delete')}
+                    </button>
+                    <button
+                      onClick={() => setDeletingId(null)}
+                      className="text-xs px-2.5 py-1 rounded-lg bg-slate-600/30 text-slate-300 hover:bg-slate-600/50 transition-colors"
+                    >
+                      {t('cancel')}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => startEdit(re)}
+                      className="text-xs text-teal-400 hover:text-teal-300 transition-colors px-2 py-1"
+                    >
+                      {t('edit')}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(re.id)}
+                      className="text-xs text-red-400/60 hover:text-red-300 transition-colors px-2 py-1"
+                    >
+                      {t('delete')}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

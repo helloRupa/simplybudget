@@ -124,7 +124,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
     });
 
     return result;
-  }, [state.expenses, filters, sort]);
+  }, [state.expenses, filters, sort, tc]);
 
   function handleSort(field: SortState['field']) {
     setSort((prev) => ({
