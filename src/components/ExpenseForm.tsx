@@ -44,15 +44,18 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
     const newErrors: Record<string, string> = {};
     if (!amount || parseFloat(amount) === 0) {
       newErrors.amount = t('amountRequired');
-    } else if (parseFloat(amount) < 0) {
-      newErrors.amount = t('amountPositive');
+    } 
+
+    if (!category) {
+      newErrors.category = t('categoryRequired');
     }
-    if (!category) newErrors.category = t('categoryRequired');
+
     if (!date) {
       newErrors.date = t('dateRequired');
     } else if (date < state.firstUseDate) {
       newErrors.date = t('dateBeforeStart');
     }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -105,7 +108,6 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
               <input
                 type="number"
                 step="0.01"
-                min="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className={`w-full bg-slate-700/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${

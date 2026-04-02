@@ -205,7 +205,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                         {expense.recurringExpenseId && <RecurringIcon />}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-sm text-right font-semibold text-amber-300">
+                    <td className={`px-5 py-3 text-sm text-right font-semibold ${expense.amount < 0 ? 'text-teal-400' : 'text-amber-300'}`}>
                       {fc(expense.amount)}
                     </td>
                     <td className="px-5 py-3 text-right">
@@ -237,7 +237,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
                     <CategoryBadge category={expense.category} />
                     <p className="text-xs text-slate-500 mt-1">{fd(expense.date)}</p>
                   </div>
-                  <p className="text-lg font-bold text-amber-300">{fc(expense.amount)}</p>
+                  <p className={`text-lg font-bold ${expense.amount < 0 ? 'text-teal-400' : 'text-amber-300'}`}>{fc(expense.amount)}</p>
                 </div>
                 {(expense.description || expense.recurringExpenseId) && (
                   <p className="text-sm text-slate-300 mb-3 inline-flex items-center gap-1.5">

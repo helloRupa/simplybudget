@@ -157,6 +157,26 @@ describe('Expenses view', () => {
       expect(within(table).getByText('$15.99')).toBeInTheDocument();
     });
 
+    it('adds a negative expense for a refund or cost adjustment', async () => {
+      const user = userEvent.setup();
+      renderExpensesView();
+
+      await screen.findByText('No expenses found.');
+
+      await user.type(screen.getByPlaceholderText('0.00'), '-15.99');
+      const formCategorySelect = screen.getAllByRole('combobox').find(
+        (s) => within(s).queryByText('Select category') !== null,
+      )!;
+      await user.selectOptions(formCategorySelect, 'Food');
+      await user.type(screen.getByPlaceholderText(/optional/i), 'Refund');
+
+      await user.click(screen.getByRole('button', { name: /^add expense$/i }));
+
+      const table = await waitFor(() => getTable());
+      expect(within(table).getByText('Refund')).toBeInTheDocument();
+      expect(within(table).getByText('-$15.99')).toBeInTheDocument();
+    });
+
     it('shows validation errors for empty form submission', async () => {
       const user = userEvent.setup();
       renderExpensesView();
@@ -166,6 +186,23 @@ describe('Expenses view', () => {
 
       expect(await screen.findByText(/amount is required/i)).toBeInTheDocument();
       expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
+    });
+
+    it('shows validation errors for $0 amount form submission', async () => {
+      const user = userEvent.setup();
+      renderExpensesView();
+      await screen.findByText('No expenses found.');
+
+      await user.type(screen.getByPlaceholderText('0.00'), '0.00');
+      // The form category select has "Select category" as its first option
+      const formCategorySelect = screen.getAllByRole('combobox').find(
+        (s) => within(s).queryByText('Select category') !== null,
+      )!;
+
+      await user.selectOptions(formCategorySelect, 'Food');
+      await user.click(screen.getByRole('button', { name: /^add expense$/i }));
+
+      expect(await screen.findByText(/amount is required/i)).toBeInTheDocument();
     });
 
     it('rejects a date before the first use date', async () => {
