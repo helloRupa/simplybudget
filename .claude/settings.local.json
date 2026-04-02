@@ -1,7 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx vitest:*)",
       "Bash(npm test:*)"
     ]
   }
