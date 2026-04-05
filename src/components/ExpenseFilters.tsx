@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useBudget } from '@/context/BudgetContext';
-import { FilterState } from '@/types';
+import { useBudget } from "@/context/BudgetContext";
+import { FilterState } from "@/types";
 
 interface ExpenseFiltersProps {
   filters: FilterState;
@@ -9,7 +9,11 @@ interface ExpenseFiltersProps {
   onFilterChange: (filters: FilterState) => void;
 }
 
-export default function ExpenseFilters({ filters, defaultFilters, onFilterChange }: ExpenseFiltersProps) {
+export default function ExpenseFilters({
+  filters,
+  defaultFilters,
+  onFilterChange,
+}: ExpenseFiltersProps) {
   const { state, t, tc } = useBudget();
 
   function updateFilter(key: keyof FilterState, value: string) {
@@ -20,7 +24,8 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
     onFilterChange(defaultFilters);
   }
 
-  const inputClass = 'w-full bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400';
+  const inputClass =
+    "w-full bg-slate-700/40 text-white text-sm rounded-xl px-4 py-2 border border-slate-500/30 focus:outline-none focus:ring-2 focus:ring-teal-400";
 
   const hasActiveFilters =
     filters.dateFrom !== defaultFilters.dateFrom ||
@@ -31,13 +36,13 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-600/20 p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-slate-300">{t('filters')}</h3>
+        <h3 className="text-sm font-semibold text-slate-300">{t("filters")}</h3>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
             className="text-xs text-teal-400 hover:text-teal-300 transition-colors"
           >
-            {t('resetFilters')}
+            {t("resetFilters")}
           </button>
         )}
       </div>
@@ -51,13 +56,17 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
             stroke="currentColor"
             strokeWidth={2}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             type="text"
             value={filters.searchQuery}
-            onChange={(e) => updateFilter('searchQuery', e.target.value)}
-            placeholder={t('searchPlaceholder')}
+            onChange={(e) => updateFilter("searchQuery", e.target.value)}
+            placeholder={t("searchPlaceholder")}
             className={`${inputClass} pl-9 pr-4 placeholder-slate-500`}
           />
         </div>
@@ -65,12 +74,14 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
         {/* Category */}
         <select
           value={filters.category}
-          onChange={(e) => updateFilter('category', e.target.value)}
+          onChange={(e) => updateFilter("category", e.target.value)}
           className={inputClass}
         >
-          <option value="">{t('allCategories')}</option>
+          <option value="">{t("allCategories")}</option>
           {state.categories.map((cat) => (
-            <option key={cat} value={cat}>{tc(cat)}</option>
+            <option key={cat} value={cat}>
+              {tc(cat)}
+            </option>
           ))}
         </select>
 
@@ -79,9 +90,9 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
           <input
             type="date"
             value={filters.dateFrom}
-            onChange={(e) => updateFilter('dateFrom', e.target.value)}
+            onChange={(e) => updateFilter("dateFrom", e.target.value)}
             className={inputClass}
-            title={t('dateFrom')}
+            title={t("dateFrom")}
           />
         </div>
 
@@ -90,9 +101,9 @@ export default function ExpenseFilters({ filters, defaultFilters, onFilterChange
           <input
             type="date"
             value={filters.dateTo}
-            onChange={(e) => updateFilter('dateTo', e.target.value)}
+            onChange={(e) => updateFilter("dateTo", e.target.value)}
             className={inputClass}
-            title={t('dateTo')}
+            title={t("dateTo")}
           />
         </div>
       </div>

@@ -8,7 +8,7 @@ export interface Expense {
   recurringExpenseId?: string; // links to RecurringExpense that generated this
 }
 
-export type RecurringFrequency = 'weekly' | 'monthly' | 'annually';
+export type RecurringFrequency = "weekly" | "monthly" | "annually";
 
 export interface RecurringExpense {
   id: string;
@@ -37,8 +37,8 @@ export interface FilterState {
   searchQuery: string;
 }
 
-export type SortField = 'date' | 'amount' | 'category';
-export type SortDirection = 'asc' | 'desc';
+export type SortField = "date" | "amount" | "category";
+export type SortDirection = "asc" | "desc";
 
 export interface SortState {
   field: SortField;

@@ -1,22 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useBudget } from '@/context/BudgetContext';
-import { Expense } from '@/types';
-import { toISODate } from '@/utils/dates';
+import { useState, useEffect, useRef } from "react";
+import { useBudget } from "@/context/BudgetContext";
+import { Expense } from "@/types";
+import { toISODate } from "@/utils/dates";
 
 interface ExpenseFormProps {
   editingExpense?: Expense | null;
   onDone: () => void;
-  onToast: (message: string, type: 'success' | 'error') => void;
+  onToast: (message: string, type: "success" | "error") => void;
 }
 
-export default function ExpenseForm({ editingExpense, onDone, onToast }: ExpenseFormProps) {
-  const { state, addExpense, updateExpense, t, tc, currencySymbol } = useBudget();
+export default function ExpenseForm({
+  editingExpense,
+  onDone,
+  onToast,
+}: ExpenseFormProps) {
+  const { state, addExpense, updateExpense, t, tc, currencySymbol } =
+    useBudget();
 
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
   const [date, setDate] = useState(toISODate(new Date()));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPulsing, setIsPulsing] = useState(false);
@@ -33,9 +38,9 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   }, [editingExpense]);
 
   function resetForm() {
-    setAmount('');
-    setCategory('');
-    setDescription('');
+    setAmount("");
+    setCategory("");
+    setDescription("");
     setDate(toISODate(new Date()));
     setErrors({});
   }
@@ -43,17 +48,17 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
     if (!amount || parseFloat(amount) === 0) {
-      newErrors.amount = t('amountRequired');
-    } 
+      newErrors.amount = t("amountRequired");
+    }
 
     if (!category) {
-      newErrors.category = t('categoryRequired');
+      newErrors.category = t("categoryRequired");
     }
 
     if (!date) {
-      newErrors.date = t('dateRequired');
+      newErrors.date = t("dateRequired");
     } else if (date < state.firstUseDate) {
-      newErrors.date = t('dateBeforeStart');
+      newErrors.date = t("dateBeforeStart");
     }
 
     setErrors(newErrors);
@@ -62,7 +67,9 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     const parsedAmount = Math.round(parseFloat(amount) * 100) / 100;
 
@@ -74,7 +81,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
         description: description.trim(),
         date,
       });
-      onToast(t('expenseUpdated'), 'success');
+      onToast(t("expenseUpdated"), "success");
     } else {
       addExpense({
         amount: parsedAmount,
@@ -82,7 +89,7 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
         description: description.trim(),
         date,
       });
-      onToast(t('expenseAdded'), 'success');
+      onToast(t("expenseAdded"), "success");
     }
 
     resetForm();
@@ -92,77 +99,93 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
   return (
     <div
       ref={formRef}
-      className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6${isPulsing ? ' highlight-pulse' : ''}`}
+      className={`bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-600/30 p-6${isPulsing ? " highlight-pulse" : ""}`}
       onAnimationEnd={() => setIsPulsing(false)}
     >
       <h2 className="text-lg font-semibold text-white mb-4">
-        {editingExpense ? t('editExpense') : t('addExpense')}
+        {editingExpense ? t("editExpense") : t("addExpense")}
       </h2>
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">{t('amount')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              {t("amount")}
+            </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">{currencySymbol}</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400">
+                {currencySymbol}
+              </span>
               <input
                 type="number"
                 step="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className={`w-full bg-slate-700/50 text-white rounded-xl pl-8 pr-4 py-2.5 border ${
-                  errors.amount ? 'border-red-400' : 'border-slate-500/50'
+                  errors.amount ? "border-red-400" : "border-slate-500/50"
                 } focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500`}
                 placeholder="0.00"
               />
             </div>
-            {errors.amount && <p className="text-red-400 text-xs mt-1">{errors.amount}</p>}
+            {errors.amount && (
+              <p className="text-red-400 text-xs mt-1">{errors.amount}</p>
+            )}
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">{t('category')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              {t("category")}
+            </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className={`w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border ${
-                errors.category ? 'border-red-400' : 'border-slate-500/50'
+                errors.category ? "border-red-400" : "border-slate-500/50"
               } focus:outline-none focus:ring-2 focus:ring-teal-400`}
             >
-              <option value="">{t('selectCategory')}</option>
+              <option value="">{t("selectCategory")}</option>
               {state.categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {tc(cat)}
                 </option>
               ))}
             </select>
-            {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
+            {errors.category && (
+              <p className="text-red-400 text-xs mt-1">{errors.category}</p>
+            )}
           </div>
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">{t('date')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              {t("date")}
+            </label>
             <input
               type="date"
               value={date}
               min={state.firstUseDate}
               onChange={(e) => setDate(e.target.value)}
               className={`w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border ${
-                errors.date ? 'border-red-400' : 'border-slate-500/50'
+                errors.date ? "border-red-400" : "border-slate-500/50"
               } focus:outline-none focus:ring-2 focus:ring-teal-400`}
             />
-            {errors.date && <p className="text-red-400 text-xs mt-1">{errors.date}</p>}
+            {errors.date && (
+              <p className="text-red-400 text-xs mt-1">{errors.date}</p>
+            )}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">{t('description')}</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">
+              {t("description")}
+            </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-slate-700/50 text-white rounded-xl px-4 py-2.5 border border-slate-500/50 focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder-slate-500"
-              placeholder={t('descriptionPlaceholder')}
+              placeholder={t("descriptionPlaceholder")}
             />
           </div>
         </div>
@@ -177,14 +200,14 @@ export default function ExpenseForm({ editingExpense, onDone, onToast }: Expense
               }}
               className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-600/30 hover:bg-slate-600/50 transition-colors"
             >
-              {t('cancel')}
+              {t("cancel")}
             </button>
           )}
           <button
             type="submit"
             className="px-6 py-2.5 rounded-xl text-sm font-medium text-white bg-teal-500 hover:bg-teal-400 shadow-lg shadow-teal-500/25 transition-all hover:shadow-teal-400/30"
           >
-            {editingExpense ? t('update') : t('addExpense')}
+            {editingExpense ? t("update") : t("addExpense")}
           </button>
         </div>
       </form>

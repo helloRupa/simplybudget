@@ -7,8 +7,8 @@ import {
   parseISO,
   isWithinInterval,
   addWeeks,
-} from 'date-fns';
-import { WeeklyBudget } from '@/types';
+} from "date-fns";
+import { WeeklyBudget } from "@/types";
 
 export function getWeekRange(date: Date = new Date()) {
   const start = startOfWeek(date, { weekStartsOn: 1 }); // Monday
@@ -20,28 +20,30 @@ export function getMonthRange(date: Date = new Date()) {
   return { start: startOfMonth(date), end: endOfMonth(date) };
 }
 
-export function formatDate(dateStr: string, intlLocale = 'en-US'): string {
+export function formatDate(dateStr: string, intlLocale = "en-US"): string {
   try {
     const date = parseISO(dateStr);
     return new Intl.DateTimeFormat(intlLocale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     }).format(date);
   } catch {
     return dateStr;
   }
 }
 
-export function formatShortDate(date: Date, intlLocale = 'en-US'): string {
+export function formatShortDate(date: Date, intlLocale = "en-US"): string {
   return new Intl.DateTimeFormat(intlLocale, {
-    month: 'short',
-    day: 'numeric',
+    month: "short",
+    day: "numeric",
   }).format(date);
 }
 
 export function isInRange(dateStr: string, from: string, to: string): boolean {
-  if (!from && !to) return true;
+  if (!from && !to) {
+    return true;
+  }
   try {
     const date = parseISO(dateStr);
     const start = from ? parseISO(from) : new Date(0);
@@ -53,10 +55,13 @@ export function isInRange(dateStr: string, from: string, to: string): boolean {
 }
 
 export function toISODate(date: Date): string {
-  return format(date, 'yyyy-MM-dd');
+  return format(date, "yyyy-MM-dd");
 }
 
-export function getBudgetForWeek(weekStart: Date, budgetHistory: WeeklyBudget[]): number {
+export function getBudgetForWeek(
+  weekStart: Date,
+  budgetHistory: WeeklyBudget[]
+): number {
   const weekStartStr = toISODate(weekStart);
   let activeBudget = budgetHistory[0]?.amount ?? 0;
   for (const entry of budgetHistory) {
@@ -69,12 +74,20 @@ export function getBudgetForWeek(weekStart: Date, budgetHistory: WeeklyBudget[])
   return activeBudget;
 }
 
-export function getTotalBudgeted(firstUseDate: string, budgetHistory: WeeklyBudget[]): number {
+export function getTotalBudgeted(
+  firstUseDate: string,
+  budgetHistory: WeeklyBudget[]
+): number {
   const weekRanges = getWeekRanges(firstUseDate);
-  return weekRanges.reduce((sum, week) => sum + getBudgetForWeek(week.start, budgetHistory), 0);
+  return weekRanges.reduce(
+    (sum, week) => sum + getBudgetForWeek(week.start, budgetHistory),
+    0
+  );
 }
 
-export function getWeekRanges(firstUseDate: string): Array<{ start: Date; end: Date }> {
+export function getWeekRanges(
+  firstUseDate: string
+): Array<{ start: Date; end: Date }> {
   try {
     const startDate = startOfWeek(parseISO(firstUseDate), { weekStartsOn: 1 });
     const now = new Date();

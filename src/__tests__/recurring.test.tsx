@@ -1,25 +1,27 @@
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BudgetProvider } from '@/context/BudgetContext';
-import RecurringExpenseManager from '@/components/RecurringExpenseManager';
-import { RecurringExpense } from '@/types';
-import { STORAGE_KEYS, DEFAULT_CATEGORIES } from '@/utils/constants';
-import { generatePendingExpenses } from '@/utils/recurring';
-import { format, startOfWeek, subWeeks, subMonths } from 'date-fns';
-import { useState, useCallback } from 'react';
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { BudgetProvider } from "@/context/BudgetContext";
+import RecurringExpenseManager from "@/components/RecurringExpenseManager";
+import { RecurringExpense } from "@/types";
+import { STORAGE_KEYS, DEFAULT_CATEGORIES } from "@/utils/constants";
+import { generatePendingExpenses } from "@/utils/recurring";
+import { format, startOfWeek, subWeeks, subMonths } from "date-fns";
+import { useState, useCallback } from "react";
 
 const now = new Date();
-const today = format(now, 'yyyy-MM-dd');
+const today = format(now, "yyyy-MM-dd");
 const thisMonday = startOfWeek(now, { weekStartsOn: 1 });
-const fourWeeksAgo = format(subWeeks(thisMonday, 4), 'yyyy-MM-dd');
+const fourWeeksAgo = format(subWeeks(thisMonday, 4), "yyyy-MM-dd");
 
-function makeRecurring(overrides: Partial<RecurringExpense> = {}): RecurringExpense {
+function makeRecurring(
+  overrides: Partial<RecurringExpense> = {}
+): RecurringExpense {
   return {
     id: crypto.randomUUID(),
     amount: 50,
-    category: 'Bills',
-    description: 'Internet',
-    frequency: 'monthly',
+    category: "Bills",
+    description: "Internet",
+    frequency: "monthly",
     dayOfMonth: 1,
     dayOfWeek: 1,
     monthOfYear: 0,
@@ -34,25 +36,47 @@ function makeRecurring(overrides: Partial<RecurringExpense> = {}): RecurringExpe
 function seedLocalStorage(recurringExpenses: RecurringExpense[] = []) {
   localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify([]));
   localStorage.setItem(STORAGE_KEYS.WEEKLY_BUDGET, JSON.stringify(200));
-  localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify([...DEFAULT_CATEGORIES]));
-  localStorage.setItem(STORAGE_KEYS.FIRST_USE_DATE, JSON.stringify(fourWeeksAgo));
-  localStorage.setItem(STORAGE_KEYS.LOCALE, JSON.stringify('en'));
-  localStorage.setItem(STORAGE_KEYS.CURRENCY, JSON.stringify('USD'));
-  localStorage.setItem(STORAGE_KEYS.RECURRING_EXPENSES, JSON.stringify(recurringExpenses));
-  localStorage.setItem(STORAGE_KEYS.BUDGET_HISTORY, JSON.stringify([{ amount: 200, startDate: fourWeeksAgo }]));
+  localStorage.setItem(
+    STORAGE_KEYS.CATEGORIES,
+    JSON.stringify([...DEFAULT_CATEGORIES])
+  );
+  localStorage.setItem(
+    STORAGE_KEYS.FIRST_USE_DATE,
+    JSON.stringify(fourWeeksAgo)
+  );
+  localStorage.setItem(STORAGE_KEYS.LOCALE, JSON.stringify("en"));
+  localStorage.setItem(STORAGE_KEYS.CURRENCY, JSON.stringify("USD"));
+  localStorage.setItem(
+    STORAGE_KEYS.RECURRING_EXPENSES,
+    JSON.stringify(recurringExpenses)
+  );
+  localStorage.setItem(
+    STORAGE_KEYS.BUDGET_HISTORY,
+    JSON.stringify([{ amount: 200, startDate: fourWeeksAgo }])
+  );
 }
 
 function RecurringView() {
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  const showToast = useCallback((message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error") => {
+      setToast({ message, type });
+    },
+    []
+  );
 
   return (
     <>
       <RecurringExpenseManager onToast={showToast} />
-      {toast && <div data-testid="toast" data-type={toast.type}>{toast.message}</div>}
+      {toast && (
+        <div data-testid="toast" data-type={toast.type}>
+          {toast.message}
+        </div>
+      )}
     </>
   );
 }
@@ -70,203 +94,245 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-describe('RecurringExpenseManager', () => {
-  describe('empty state', () => {
-    it('shows no recurring expenses message', async () => {
+describe("RecurringExpenseManager", () => {
+  describe("empty state", () => {
+    it("shows no recurring expenses message", async () => {
       renderRecurring();
-      expect(await screen.findByText(/no recurring expenses/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/no recurring expenses/i)
+      ).toBeInTheDocument();
     });
 
-    it('shows the add button', async () => {
+    it("shows the add button", async () => {
       renderRecurring();
-      expect(await screen.findByRole('button', { name: /add recurring expense/i })).toBeInTheDocument();
+      expect(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      ).toBeInTheDocument();
     });
   });
 
-  describe('displaying recurring expenses', () => {
-    it('renders a recurring expense with its details', async () => {
-      const recurring = [makeRecurring({ amount: 75, description: 'Internet bill', category: 'Bills' })];
+  describe("displaying recurring expenses", () => {
+    it("renders a recurring expense with its details", async () => {
+      const recurring = [
+        makeRecurring({
+          amount: 75,
+          description: "Internet bill",
+          category: "Bills",
+        }),
+      ];
       renderRecurring(recurring);
 
-      expect(await screen.findByText('$75.00')).toBeInTheDocument();
-      expect(screen.getByText('Internet bill')).toBeInTheDocument();
-      expect(screen.getByText('Bills')).toBeInTheDocument();
+      expect(await screen.findByText("$75.00")).toBeInTheDocument();
+      expect(screen.getByText("Internet bill")).toBeInTheDocument();
+      expect(screen.getByText("Bills")).toBeInTheDocument();
     });
 
-    it('shows the frequency label for monthly', async () => {
-      const recurring = [makeRecurring({ frequency: 'monthly', dayOfMonth: 15 })];
+    it("shows the frequency label for monthly", async () => {
+      const recurring = [
+        makeRecurring({ frequency: "monthly", dayOfMonth: 15 }),
+      ];
       renderRecurring(recurring);
 
-      expect(await screen.findByText(/monthly, on day 15/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/monthly, on day 15/i)
+      ).toBeInTheDocument();
     });
 
-    it('shows the frequency label for weekly', async () => {
-      const recurring = [makeRecurring({ frequency: 'weekly', dayOfWeek: 3 })];
+    it("shows the frequency label for weekly", async () => {
+      const recurring = [makeRecurring({ frequency: "weekly", dayOfWeek: 3 })];
       renderRecurring(recurring);
 
-      expect(await screen.findByText(/weekly, every Wednesday/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/weekly, every Wednesday/i)
+      ).toBeInTheDocument();
     });
 
-    it('shows the frequency label for annually', async () => {
-      const recurring = [makeRecurring({ frequency: 'annually', monthOfYear: 11, dayOfMonth: 25 })];
+    it("shows the frequency label for annually", async () => {
+      const recurring = [
+        makeRecurring({
+          frequency: "annually",
+          monthOfYear: 11,
+          dayOfMonth: 25,
+        }),
+      ];
       renderRecurring(recurring);
 
-      expect(await screen.findByText(/annually, December 25/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/annually, December 25/i)
+      ).toBeInTheDocument();
     });
   });
 
-  describe('adding a recurring expense', () => {
-    it('opens the form when add button is clicked', async () => {
+  describe("adding a recurring expense", () => {
+    it("opens the form when add button is clicked", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
 
-      expect(screen.getByText('Frequency')).toBeInTheDocument();
-      expect(screen.getByText('Start Date')).toBeInTheDocument();
+      expect(screen.getByText("Frequency")).toBeInTheDocument();
+      expect(screen.getByText("Start Date")).toBeInTheDocument();
     });
 
-    it('adds a monthly recurring expense', async () => {
+    it("adds a monthly recurring expense", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
 
       // Fill out the form
-      const amountInputs = screen.getAllByRole('spinbutton');
-      await user.type(amountInputs[0], '99.50');
+      const amountInputs = screen.getAllByRole("spinbutton");
+      await user.type(amountInputs[0], "99.50");
 
-      const categorySelect = screen.getAllByRole('combobox').find(
-        (s) => within(s).queryByText('Select category') !== null,
-      )!;
-      await user.selectOptions(categorySelect, 'Bills');
+      const categorySelect = screen
+        .getAllByRole("combobox")
+        .find((s) => within(s).queryByText("Select category") !== null)!;
+      await user.selectOptions(categorySelect, "Bills");
 
-      await user.type(screen.getByPlaceholderText(/optional/i), 'Phone plan');
+      await user.type(screen.getByPlaceholderText(/optional/i), "Phone plan");
 
       // Frequency defaults to monthly, day of month defaults to 1
-      await user.click(screen.getByRole('button', { name: /save/i }));
+      await user.click(screen.getByRole("button", { name: /save/i }));
 
-      expect(await screen.findByTestId('toast')).toHaveTextContent(/recurring expense added/i);
-      expect(screen.getByText('Phone plan')).toBeInTheDocument();
-      expect(screen.getByText('$99.50')).toBeInTheDocument();
+      expect(await screen.findByTestId("toast")).toHaveTextContent(
+        /recurring expense added/i
+      );
+      expect(screen.getByText("Phone plan")).toBeInTheDocument();
+      expect(screen.getByText("$99.50")).toBeInTheDocument();
     });
 
-    it('shows validation errors for empty form submission', async () => {
+    it("shows validation errors for empty form submission", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
-      await user.click(screen.getByRole('button', { name: /save/i }));
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
+      await user.click(screen.getByRole("button", { name: /save/i }));
 
-      expect(screen.getByText(/amount must be greater than zero/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/amount must be greater than zero/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/please select a category/i)).toBeInTheDocument();
     });
 
-    it('cancels adding and hides the form', async () => {
+    it("cancels adding and hides the form", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
-      expect(screen.getByText('Frequency')).toBeInTheDocument();
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
+      expect(screen.getByText("Frequency")).toBeInTheDocument();
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole("button", { name: /cancel/i }));
 
-      expect(screen.queryByText('Frequency')).not.toBeInTheDocument();
+      expect(screen.queryByText("Frequency")).not.toBeInTheDocument();
     });
 
-    it('shows day of week field when frequency is weekly', async () => {
+    it("shows day of week field when frequency is weekly", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
 
-      const frequencySelect = screen.getAllByRole('combobox').find(
-        (s) => within(s).queryByText('weekly') !== null,
-      )!;
-      await user.selectOptions(frequencySelect, 'weekly');
+      const frequencySelect = screen
+        .getAllByRole("combobox")
+        .find((s) => within(s).queryByText("weekly") !== null)!;
+      await user.selectOptions(frequencySelect, "weekly");
 
-      expect(screen.getByText('Day of Week')).toBeInTheDocument();
+      expect(screen.getByText("Day of Week")).toBeInTheDocument();
     });
 
-    it('shows month and day fields when frequency is annually', async () => {
+    it("shows month and day fields when frequency is annually", async () => {
       const user = userEvent.setup();
       renderRecurring();
 
-      await user.click(await screen.findByRole('button', { name: /add recurring expense/i }));
+      await user.click(
+        await screen.findByRole("button", { name: /add recurring expense/i })
+      );
 
-      const frequencySelect = screen.getAllByRole('combobox').find(
-        (s) => within(s).queryByText('weekly') !== null,
-      )!;
-      await user.selectOptions(frequencySelect, 'annually');
+      const frequencySelect = screen
+        .getAllByRole("combobox")
+        .find((s) => within(s).queryByText("weekly") !== null)!;
+      await user.selectOptions(frequencySelect, "annually");
 
-      expect(screen.getByText('Month')).toBeInTheDocument();
-      expect(screen.getByText('Day of Month')).toBeInTheDocument();
+      expect(screen.getByText("Month")).toBeInTheDocument();
+      expect(screen.getByText("Day of Month")).toBeInTheDocument();
     });
   });
 
-  describe('editing a recurring expense', () => {
-    it('populates the form and updates the expense', async () => {
+  describe("editing a recurring expense", () => {
+    it("populates the form and updates the expense", async () => {
       const user = userEvent.setup();
-      const recurring = [makeRecurring({ description: 'Old internet', amount: 50 })];
+      const recurring = [
+        makeRecurring({ description: "Old internet", amount: 50 }),
+      ];
       renderRecurring(recurring);
 
-      await user.click(await screen.findByRole('button', { name: /^edit$/i }));
+      await user.click(await screen.findByRole("button", { name: /^edit$/i }));
 
-      expect(screen.getByDisplayValue('Old internet')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('50')).toBeInTheDocument();
+      expect(screen.getByDisplayValue("Old internet")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("50")).toBeInTheDocument();
 
-      const descInput = screen.getByDisplayValue('Old internet');
+      const descInput = screen.getByDisplayValue("Old internet");
       await user.clear(descInput);
-      await user.type(descInput, 'New fiber');
+      await user.type(descInput, "New fiber");
 
-      await user.click(screen.getByRole('button', { name: /update/i }));
+      await user.click(screen.getByRole("button", { name: /update/i }));
 
-      expect(await screen.findByTestId('toast')).toHaveTextContent(/updated/i);
-      expect(screen.getByText('New fiber')).toBeInTheDocument();
-      expect(screen.queryByText('Old internet')).not.toBeInTheDocument();
+      expect(await screen.findByTestId("toast")).toHaveTextContent(/updated/i);
+      expect(screen.getByText("New fiber")).toBeInTheDocument();
+      expect(screen.queryByText("Old internet")).not.toBeInTheDocument();
     });
   });
 
-  describe('deleting a recurring expense', () => {
-    it('shows confirmation before deleting', async () => {
+  describe("deleting a recurring expense", () => {
+    it("shows confirmation before deleting", async () => {
       const user = userEvent.setup();
-      const recurring = [makeRecurring({ description: 'To remove' })];
+      const recurring = [makeRecurring({ description: "To remove" })];
       renderRecurring(recurring);
 
-      await screen.findByText('To remove');
-      await user.click(screen.getByRole('button', { name: /^delete$/i }));
+      await screen.findByText("To remove");
+      await user.click(screen.getByRole("button", { name: /^delete$/i }));
 
       // First click shows confirmation — expense still visible, no toast yet
-      expect(screen.getByText('To remove')).toBeInTheDocument();
-      expect(screen.queryByTestId('toast')).not.toBeInTheDocument();
+      expect(screen.getByText("To remove")).toBeInTheDocument();
+      expect(screen.queryByTestId("toast")).not.toBeInTheDocument();
 
       // Cancel dismisses confirmation
-      await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-      expect(screen.getByText('To remove')).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /^cancel$/i }));
+      expect(screen.getByText("To remove")).toBeInTheDocument();
     });
 
-    it('removes the recurring expense after confirming', async () => {
+    it("removes the recurring expense after confirming", async () => {
       const user = userEvent.setup();
-      const recurring = [makeRecurring({ description: 'To remove' })];
+      const recurring = [makeRecurring({ description: "To remove" })];
       renderRecurring(recurring);
 
-      await screen.findByText('To remove');
-      await user.click(screen.getByRole('button', { name: /^delete$/i }));
-      await user.click(screen.getByRole('button', { name: /^delete$/i }));
+      await screen.findByText("To remove");
+      await user.click(screen.getByRole("button", { name: /^delete$/i }));
+      await user.click(screen.getByRole("button", { name: /^delete$/i }));
 
-      expect(await screen.findByTestId('toast')).toHaveTextContent(/deleted/i);
-      expect(screen.queryByText('To remove')).not.toBeInTheDocument();
+      expect(await screen.findByTestId("toast")).toHaveTextContent(/deleted/i);
+      expect(screen.queryByText("To remove")).not.toBeInTheDocument();
       expect(screen.getByText(/no recurring expenses/i)).toBeInTheDocument();
     });
   });
 });
 
-describe('generatePendingExpenses', () => {
-  describe('monthly generation', () => {
-    it('generates expenses for past months since start date', () => {
-      const threeMonthsAgo = format(subMonths(now, 3), 'yyyy-MM-dd');
+describe("generatePendingExpenses", () => {
+  describe("monthly generation", () => {
+    it("generates expenses for past months since start date", () => {
+      const threeMonthsAgo = format(subMonths(now, 3), "yyyy-MM-dd");
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 1,
         startDate: threeMonthsAgo,
         lastGeneratedDate: null,
@@ -278,15 +344,18 @@ describe('generatePendingExpenses', () => {
       expect(newExpenses.length).toBeGreaterThanOrEqual(3);
       newExpenses.forEach((exp) => {
         expect(exp.amount).toBe(50);
-        expect(exp.category).toBe('Bills');
+        expect(exp.category).toBe("Bills");
         expect(exp.recurringExpenseId).toBe(re.id);
       });
     });
 
-    it('does not generate future expenses', () => {
-      const nextMonth = format(new Date(now.getFullYear(), now.getMonth() + 2, 1), 'yyyy-MM-dd');
+    it("does not generate future expenses", () => {
+      const nextMonth = format(
+        new Date(now.getFullYear(), now.getMonth() + 2, 1),
+        "yyyy-MM-dd"
+      );
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 1,
         startDate: nextMonth,
         lastGeneratedDate: null,
@@ -296,11 +365,11 @@ describe('generatePendingExpenses', () => {
       expect(newExpenses).toHaveLength(0);
     });
 
-    it('does not regenerate already-generated months', () => {
-      const twoMonthsAgo = format(subMonths(now, 2), 'yyyy-MM-dd');
-      const oneMonthAgo = format(subMonths(now, 1), 'yyyy-MM-dd');
+    it("does not regenerate already-generated months", () => {
+      const twoMonthsAgo = format(subMonths(now, 2), "yyyy-MM-dd");
+      const oneMonthAgo = format(subMonths(now, 1), "yyyy-MM-dd");
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 1,
         startDate: twoMonthsAgo,
         lastGeneratedDate: oneMonthAgo,
@@ -315,11 +384,11 @@ describe('generatePendingExpenses', () => {
       });
     });
 
-    it('respects the end date', () => {
-      const threeMonthsAgo = format(subMonths(now, 3), 'yyyy-MM-dd');
-      const twoMonthsAgo = format(subMonths(now, 2), 'yyyy-MM-dd');
+    it("respects the end date", () => {
+      const threeMonthsAgo = format(subMonths(now, 3), "yyyy-MM-dd");
+      const twoMonthsAgo = format(subMonths(now, 2), "yyyy-MM-dd");
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 1,
         startDate: threeMonthsAgo,
         endDate: twoMonthsAgo,
@@ -333,11 +402,11 @@ describe('generatePendingExpenses', () => {
       });
     });
 
-    it('clamps day of month for short months', () => {
+    it("clamps day of month for short months", () => {
       // February has 28 days; dayOfMonth=31 should clamp to 28
-      const feb1 = '2026-02-01';
+      const feb1 = "2026-02-01";
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 31,
         startDate: feb1,
         lastGeneratedDate: null,
@@ -347,15 +416,15 @@ describe('generatePendingExpenses', () => {
       const { newExpenses } = generatePendingExpenses([re], febDate);
 
       expect(newExpenses.length).toBeGreaterThanOrEqual(1);
-      expect(newExpenses[0].date).toBe('2026-02-28');
+      expect(newExpenses[0].date).toBe("2026-02-28");
     });
   });
 
-  describe('weekly generation', () => {
-    it('generates weekly expenses on the correct day', () => {
-      const fourWeeksAgoDate = format(subWeeks(now, 4), 'yyyy-MM-dd');
+  describe("weekly generation", () => {
+    it("generates weekly expenses on the correct day", () => {
+      const fourWeeksAgoDate = format(subWeeks(now, 4), "yyyy-MM-dd");
       const re = makeRecurring({
-        frequency: 'weekly',
+        frequency: "weekly",
         dayOfWeek: 1, // Monday
         startDate: fourWeeksAgoDate,
         lastGeneratedDate: null,
@@ -365,17 +434,17 @@ describe('generatePendingExpenses', () => {
 
       expect(newExpenses.length).toBeGreaterThanOrEqual(3);
       newExpenses.forEach((exp) => {
-        const date = new Date(exp.date + 'T00:00:00');
+        const date = new Date(exp.date + "T00:00:00");
         expect(date.getDay()).toBe(1); // Monday
       });
     });
   });
 
-  describe('annually generation', () => {
-    it('generates an annual expense when the date has passed this year', () => {
+  describe("annually generation", () => {
+    it("generates an annual expense when the date has passed this year", () => {
       const lastYear = `${now.getFullYear() - 1}-01-15`;
       const re = makeRecurring({
-        frequency: 'annually',
+        frequency: "annually",
         monthOfYear: 0, // January
         dayOfMonth: 15,
         startDate: lastYear,
@@ -391,11 +460,11 @@ describe('generatePendingExpenses', () => {
       });
     });
 
-    it('does not generate if annual date has not occurred yet this year', () => {
+    it("does not generate if annual date has not occurred yet this year", () => {
       // Use December 31 — unlikely to have passed if test runs before then
       const startDate = `${now.getFullYear()}-12-31`;
       const re = makeRecurring({
-        frequency: 'annually',
+        frequency: "annually",
         monthOfYear: 11, // December
         dayOfMonth: 31,
         startDate,
@@ -410,11 +479,11 @@ describe('generatePendingExpenses', () => {
     });
   });
 
-  describe('updates lastGeneratedDate', () => {
-    it('sets lastGeneratedDate on the updated recurring expense', () => {
-      const twoMonthsAgo = format(subMonths(now, 2), 'yyyy-MM-dd');
+  describe("updates lastGeneratedDate", () => {
+    it("sets lastGeneratedDate on the updated recurring expense", () => {
+      const twoMonthsAgo = format(subMonths(now, 2), "yyyy-MM-dd");
       const re = makeRecurring({
-        frequency: 'monthly',
+        frequency: "monthly",
         dayOfMonth: 1,
         startDate: twoMonthsAgo,
         lastGeneratedDate: null,

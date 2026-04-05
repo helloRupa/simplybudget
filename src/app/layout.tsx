@@ -15,7 +15,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "SimplyBudget - Track Your Spending",
-  description: "A modern personal budgeting app to help you track and manage your expenses simply and effectively.",
+  description:
+    "A modern personal budgeting app to help you track and manage your expenses simply and effectively.",
 };
 
 export default function RootLayout({
