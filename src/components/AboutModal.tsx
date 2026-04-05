@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useBudget } from '@/context/BudgetContext';
 import moneyFrog from '../assets/images/moneyFrog.svg';
+import AppName from './AppName';
 
 interface AboutModalProps {
   onClose: () => void;
@@ -34,10 +35,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
             alt="Money Frog"
             className="w-20 h-20 mb-3 bg-white p-2 rounded-3xl border-[3px] border-teal-500"
           />
-          <h2 className="text-2xl font-extrabold tracking-tight">
-            <span className="text-white">Simply</span>
-            <span className="text-teal-400">Budget</span>
-          </h2>
+          <AppName as="h2" />
           <p className="text-slate-400 text-sm mt-1">{t('aboutVersion')} 0.1.0</p>
         </div>
 

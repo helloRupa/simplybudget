@@ -2,7 +2,8 @@
 
 import { useBudget } from '@/context/BudgetContext';
 import { LOCALE_NAMES, LocaleKey } from '@/i18n/locales';
-import moneyFrog from '../assets/images/moneyFrog.svg'
+import moneyFrog from '../assets/images/moneyFrog.svg';
+import AppName from './AppName';
 
 export type Tab = 'dashboard' | 'expenses' | 'settings';
 
@@ -58,10 +59,7 @@ export default function Header({ activeTab, onTabChange, onAboutClick }: HeaderP
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             <img src={moneyFrog.src} alt="Money Frog" className="w-12 h-12 bg-white p-1 rounded-2xl border-2 border-teal-500" />
-            <h1 className="text-2xl font-extrabold tracking-tight">
-              <span className="text-white">Simply</span>
-              <span className="text-teal-400">Budget</span>
-            </h1>
+            <AppName />
             <button
               onClick={onAboutClick}
               className="-ml-0.5 text-slate-400 hover:text-teal-300 transition-colors"
