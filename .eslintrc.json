@@ -2,6 +2,19 @@
   "extends": ["next/core-web-vitals", "next/typescript", "prettier"],
   "rules": {
     "@next/next/no-img-element": "off",
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
+    "padding-line-between-statements": [
+      "warn",
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": ["if", "try", "for", "while", "switch"]
+      },
+      {
+        "blankLine": "always",
+        "prev": ["if", "try", "for", "while", "switch"],
+        "next": "*"
+      }
+    ]
   }
 }

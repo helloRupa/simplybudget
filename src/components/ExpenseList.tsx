@@ -69,6 +69,7 @@ function SortIndicator({
   if (sort.field !== field) {
     return <span className="text-slate-600 ml-1">↕</span>;
   }
+
   return (
     <span className="text-slate-300 ml-1">
       {sort.direction === "desc" ? "↓" : "↑"}
@@ -150,9 +151,11 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
       if (filters.category && expense.category !== filters.category) {
         return false;
       }
+
       if (!isInRange(expense.date, filters.dateFrom, filters.dateTo)) {
         return false;
       }
+
       if (filters.searchQuery) {
         const q = filters.searchQuery.toLowerCase();
         return (
@@ -161,11 +164,13 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
           expense.amount.toString().includes(q)
         );
       }
+
       return true;
     });
 
     result.sort((a, b) => {
       let cmp = 0;
+
       switch (sort.field) {
         case "date":
           cmp = a.date.localeCompare(b.date);
@@ -177,6 +182,7 @@ export default function ExpenseList({ onEdit, onToast }: ExpenseListProps) {
           cmp = a.category.localeCompare(b.category);
           break;
       }
+
       return sort.direction === "desc" ? -cmp : cmp;
     });
 

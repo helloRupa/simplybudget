@@ -44,6 +44,7 @@ export function isInRange(dateStr: string, from: string, to: string): boolean {
   if (!from && !to) {
     return true;
   }
+
   try {
     const date = parseISO(dateStr);
     const start = from ? parseISO(from) : new Date(0);
@@ -64,6 +65,7 @@ export function getBudgetForWeek(
 ): number {
   const weekStartStr = toISODate(weekStart);
   let activeBudget = budgetHistory[0]?.amount ?? 0;
+
   for (const entry of budgetHistory) {
     if (entry.startDate <= weekStartStr) {
       activeBudget = entry.amount;
@@ -71,6 +73,7 @@ export function getBudgetForWeek(
       break;
     }
   }
+
   return activeBudget;
 }
 
@@ -93,6 +96,7 @@ export function getWeekRanges(
     const now = new Date();
     const weeks: Array<{ start: Date; end: Date }> = [];
     let current = startDate;
+
     while (current <= now) {
       weeks.push({
         start: current,
@@ -100,6 +104,7 @@ export function getWeekRanges(
       });
       current = addWeeks(current, 1);
     }
+
     return weeks;
   } catch {
     return [];

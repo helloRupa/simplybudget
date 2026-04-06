@@ -47,6 +47,7 @@ export default function ExpenseForm({
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
+
     if (!amount || parseFloat(amount) === 0) {
       newErrors.amount = t("amountRequired");
     }
@@ -67,6 +68,7 @@ export default function ExpenseForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!validate()) {
       return;
     }

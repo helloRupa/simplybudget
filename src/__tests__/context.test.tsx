@@ -17,6 +17,7 @@ function seedLocalStorage(overrides: Record<string, unknown> = {}) {
     [STORAGE_KEYS.BUDGET_HISTORY]: [{ amount: 200, startDate: sixtyDaysAgo }],
   };
   const merged = { ...defaults, ...overrides };
+
   for (const [key, value] of Object.entries(merged)) {
     localStorage.setItem(key, JSON.stringify(value));
   }
@@ -65,6 +66,7 @@ function ContextHarness() {
       <button
         onClick={() => {
           const expense = state.expenses[0];
+
           if (expense) {
             updateExpense({
               ...expense,
@@ -79,6 +81,7 @@ function ContextHarness() {
       <button
         onClick={() => {
           const expense = state.expenses[0];
+
           if (expense) {
             deleteExpense(expense.id);
           }

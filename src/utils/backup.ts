@@ -44,11 +44,14 @@ export function parseBackup(file: File): Promise<BackupData["data"]> {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(reader.result as string);
+
         if (!parsed.version || !parsed.data) {
           reject(new Error("Invalid backup file format."));
           return;
         }
+
         const { data } = parsed as BackupData;
+
         if (
           !Array.isArray(data.expenses) ||
           typeof data.weeklyBudget !== "number" ||
@@ -58,6 +61,7 @@ export function parseBackup(file: File): Promise<BackupData["data"]> {
           reject(new Error("Backup file is missing required data."));
           return;
         }
+
         resolve(data);
       } catch {
         reject(new Error("Could not parse backup file."));

@@ -40,6 +40,7 @@ function seedLocalStorage(overrides: Record<string, unknown> = {}) {
     [STORAGE_KEYS.BUDGET_HISTORY]: [{ amount: 200, startDate: fourWeeksAgo }],
   };
   const merged = { ...defaults, ...overrides };
+
   for (const [key, value] of Object.entries(merged)) {
     localStorage.setItem(key, JSON.stringify(value));
   }

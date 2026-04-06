@@ -41,6 +41,7 @@ function ensureFrequency(re: RecurringExpense): RecurringExpense {
   if (!re.frequency) {
     return { ...re, frequency: "monthly" };
   }
+
   return re;
 }
 
@@ -55,6 +56,7 @@ function generateWeekly(
 
   // Find the first week to generate from
   let cursor: Date;
+
   if (re.lastGeneratedDate) {
     // Start from one week after last generated
     cursor = addWeeks(parseISO(re.lastGeneratedDate), 1);
@@ -78,10 +80,12 @@ function generateWeekly(
     if (dateStr > todayStr) {
       break;
     }
+
     if (dateStr < re.startDate) {
       cursor = addWeeks(cursor, 1);
       continue;
     }
+
     if (re.endDate && dateStr > re.endDate) {
       break;
     }
@@ -102,6 +106,7 @@ function generateMonthly(
   let lastDate = re.lastGeneratedDate;
 
   let genStart: Date;
+
   if (re.lastGeneratedDate) {
     genStart = startOfMonth(addMonths(parseISO(re.lastGeneratedDate), 1));
   } else {
@@ -118,14 +123,18 @@ function generateMonthly(
     if (expenseDate > todayStr) {
       break;
     }
+
     if (expenseDate < re.startDate) {
       month++;
+
       if (month > 11) {
         month = 0;
         year++;
       }
+
       continue;
     }
+
     if (re.endDate && expenseDate > re.endDate) {
       break;
     }
@@ -134,6 +143,7 @@ function generateMonthly(
     lastDate = expenseDate;
 
     month++;
+
     if (month > 11) {
       month = 0;
       year++;
@@ -152,6 +162,7 @@ function generateAnnually(
   const targetMonth = re.monthOfYear ?? parseISO(re.startDate).getMonth();
 
   let startYear: number;
+
   if (re.lastGeneratedDate) {
     startYear = parseISO(re.lastGeneratedDate).getFullYear() + 1;
   } else {
@@ -165,9 +176,11 @@ function generateAnnually(
     if (expenseDate > todayStr) {
       break;
     }
+
     if (expenseDate < re.startDate) {
       continue;
     }
+
     if (re.endDate && expenseDate > re.endDate) {
       break;
     }
@@ -210,6 +223,7 @@ export function generatePendingExpenses(
     }
 
     newExpenses.push(...result.expenses);
+
     if (result.lastDate) {
       updated.lastGeneratedDate = result.lastDate;
     }

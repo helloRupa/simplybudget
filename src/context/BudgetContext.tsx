@@ -197,6 +197,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       ),
       budgetHistory: getItem<WeeklyBudget[]>(STORAGE_KEYS.BUDGET_HISTORY, []),
     };
+
     // Migration: seed budget history for existing users
     if (loaded.budgetHistory.length === 0) {
       loaded.budgetHistory = [
@@ -204,6 +205,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       ];
       setItem(STORAGE_KEYS.BUDGET_HISTORY, loaded.budgetHistory);
     }
+
     // Set first use date if not set, and persist the week-aligned value
     if (!localStorage.getItem(STORAGE_KEYS.FIRST_USE_DATE)) {
       setItem(STORAGE_KEYS.FIRST_USE_DATE, weekStart);
@@ -217,6 +219,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         loaded.recurringExpenses,
         new Date()
       );
+
       if (newExpenses.length > 0) {
         loaded.expenses = [...newExpenses, ...loaded.expenses];
         loaded.recurringExpenses = updatedRecurringExpenses;
@@ -234,6 +237,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     if (!isLoaded) {
       return;
     }
+
     setItem(STORAGE_KEYS.EXPENSES, state.expenses);
     setItem(STORAGE_KEYS.WEEKLY_BUDGET, state.weeklyBudget);
     setItem(STORAGE_KEYS.CATEGORIES, state.categories);
@@ -271,14 +275,17 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
   const addCategory = useCallback(
     (name: string): boolean => {
       const trimmed = name.trim();
+
       if (!trimmed) {
         return false;
       }
+
       if (
         state.categories.some((c) => c.toLowerCase() === trimmed.toLowerCase())
       ) {
         return false;
       }
+
       dispatch({ type: "ADD_CATEGORY", payload: trimmed });
       return true;
     },
@@ -314,6 +321,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         [newRecurring],
         new Date()
       );
+
       if (newExpenses.length > 0) {
         newExpenses.forEach((exp) =>
           dispatch({ type: "ADD_EXPENSE", payload: exp })
@@ -404,8 +412,10 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
 export function useBudget() {
   const ctx = useContext(BudgetContext);
+
   if (!ctx) {
     throw new Error("useBudget must be used within BudgetProvider");
   }
+
   return ctx;
 }

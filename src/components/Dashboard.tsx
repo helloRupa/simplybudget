@@ -91,6 +91,7 @@ export default function Dashboard() {
       if (!monthlyCategoryTotals[e.category]) {
         monthlyCategoryTotals[e.category] = { current: 0, future: 0 };
       }
+
       if (e.date > today) {
         monthlyCategoryTotals[e.category].future += e.amount;
       } else {
@@ -428,9 +429,11 @@ function StyledAmount({
   // Split formatted currency into symbol, whole number, and decimal parts
   // e.g. "$1,234.56" -> ["$", "1,234", ".56"]
   const match = value.match(/^([^\d]*)([\d,]+)(\.\d+)?(.*)$/);
+
   if (!match) {
     return <span className={colorClass}>{value}</span>;
   }
+
   const [, prefix, whole, decimal, suffix] = match;
   return (
     <span className="inline-flex items-baseline">

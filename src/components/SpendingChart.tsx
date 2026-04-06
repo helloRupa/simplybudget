@@ -28,13 +28,17 @@ function getBarFill(spent: number, budget: number): string {
   if (budget <= 0) {
     return "url(#barTeal)";
   }
+
   const pct = (spent / budget) * 100;
+
   if (pct > 90) {
     return "url(#barRed)";
   }
+
   if (pct > 70) {
     return "url(#barAmber)";
   }
+
   return "url(#barTeal)";
 }
 

@@ -97,12 +97,15 @@ export default function RecurringExpenseManager({ onToast }: Props) {
     const newErrors: Record<string, string> = {};
 
     const parsedAmount = parseFloat(amount);
+
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
       newErrors.amount = t("amountPositive");
     }
+
     if (!category) {
       newErrors.category = t("categoryRequired");
     }
+
     if (!startDate) {
       newErrors.startDate = t("dateRequired");
     }
@@ -126,6 +129,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
 
     if (editingId) {
       const existing = state.recurringExpenses.find((r) => r.id === editingId);
+
       if (existing) {
         updateRecurringExpense({ ...existing, ...data });
         onToast(t("recurringExpenseUpdated"), "success");
@@ -134,6 +138,7 @@ export default function RecurringExpenseManager({ onToast }: Props) {
       addRecurringExpense(data);
       onToast(t("recurringExpenseAdded"), "success");
     }
+
     resetForm();
   }
 

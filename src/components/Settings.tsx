@@ -37,10 +37,12 @@ export default function Settings({ onToast }: SettingsProps) {
   function handleBudgetSubmit(e: React.FormEvent) {
     e.preventDefault();
     const amount = parseFloat(budgetInput);
+
     if (isNaN(amount) || amount <= 0) {
       setBudgetError(t("budgetPositive"));
       return;
     }
+
     setBudgetError("");
     setWeeklyBudget(Math.round(amount * 100) / 100);
     onToast(t("budgetUpdated"), "success");
@@ -48,10 +50,13 @@ export default function Settings({ onToast }: SettingsProps) {
 
   function handleAddCategory(e: React.FormEvent) {
     e.preventDefault();
+
     if (!newCategory.trim()) {
       return;
     }
+
     const success = addCategory(newCategory.trim());
+
     if (success) {
       setNewCategory("");
       onToast(t("categoryAdded"), "success");
@@ -65,6 +70,7 @@ export default function Settings({ onToast }: SettingsProps) {
       onToast(t("noExpenses"), "error");
       return;
     }
+
     exportToCSV(state.expenses, t as (key: string) => string, tc, fd);
     onToast(t("csvExported"), "success");
   }
@@ -76,14 +82,18 @@ export default function Settings({ onToast }: SettingsProps) {
 
   async function handleImportBackup(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+
     if (!file) {
       return;
     }
+
     // Reset so the same file can be selected again
     e.target.value = "";
+
     if (!confirm(t("importConfirm"))) {
       return;
     }
+
     try {
       const data = await parseBackup(file);
       importData({
