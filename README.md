@@ -36,7 +36,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Deploy to GitHub Pages
 
-If you wish to deploy to GitHub pages, update `.github/workflows/deploy.yml` to match your project's settings.
+If you want to deploy to GitHub pages, update `.github/workflows/deploy.yml` to match your project's settings.
 
 In `next.config.mjs`, update:
 
