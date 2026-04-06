@@ -35,4 +35,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# docs
 Description.txt
+git_commits.txt
+git_log.txt
